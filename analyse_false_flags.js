@@ -15,12 +15,13 @@
  *   - Real bug that was fixed and then tester verified "working as expected"
  *   - Developer posted a fix ZIP/build, then tester closed as resolved
  */
-const fs   = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const BASE      = String.raw`C:\Users\z00597ew\.claude\projects\C--optimus-prime-mission-defect-analysis\b593024f-81b5-4d1b-9525-4f972940486d\tool-results`;
-const OUT_FF    = String.raw`C:\optimus-prime\mission\defect-analysis\false_flags.json`;
-const OUT_FIXED = String.raw`C:\optimus-prime\mission\defect-analysis\dev_metrics_corrected.json`;
+// Path to tool results directory (set via BASE_PATH env var or default to ./tool-results)
+const BASE = process.env.BASE_PATH || path.join(__dirname, "tool-results");
+const OUT_FF = path.join(__dirname, "false_flags.json");
+const OUT_FIXED = path.join(__dirname, "dev_metrics_corrected.json");
 
 const DEVELOPERS = {
   "712020:d9aa0306-1300-44fc-bd29-8abe306f07fe": "Abubakar Adamu",
@@ -37,16 +38,25 @@ const DEVELOPERS = {
 const DEV_IDS = new Set(Object.keys(DEVELOPERS));
 
 const DEVELOPER_EMAILS = {
-  "712020:d9aa0306-1300-44fc-bd29-8abe306f07fe": "abubakar.adamu.ext@brightlysoftware.com",
-  "712020:407d6248-323b-459e-a956-57d36e03a526": "adinan.alhassan.ext@brightlysoftware.com",
-  "712020:f498aef4-0ecd-43b5-8627-6e8729712986": "abenezer.bayu.ext@brightlysoftware.com",
+  "712020:d9aa0306-1300-44fc-bd29-8abe306f07fe":
+    "abubakar.adamu.ext@brightlysoftware.com",
+  "712020:407d6248-323b-459e-a956-57d36e03a526":
+    "adinan.alhassan.ext@brightlysoftware.com",
+  "712020:f498aef4-0ecd-43b5-8627-6e8729712986":
+    "abenezer.bayu.ext@brightlysoftware.com",
   "712020:4e753b4c-292f-43c1-aec8-346aa573fc63": "emmy.bbaale.ext@siemens.com",
-  "712020:391f1fcb-67ae-4668-956c-0025cc785212": "ojobe.ekpor.ext@brightlysoftware.com",
-  "712020:9484d75f-f78a-4c62-86d5-e3202d55e129": "kashish.goyal.ext@siemens.com",
-  "712020:98376025-a295-45d3-8479-a6c4c617708b": "michael.johnson.ext@brightlysoftware.com",
-  "712020:5a76440b-b20f-4c76-9fe0-e08db894a301": "nilesh.pore.ext@brightlysoftware.com",
-  "712020:9f4e93bd-1ced-489a-8034-3965e2ca3beb": "touqeer.shakeel.ext@brightlysoftware.com",
-  "712020:b8298392-2a8a-4bc9-ae32-87f56ff8eb8e": "bhanu.teja.ext@brightlysoftware.com",
+  "712020:391f1fcb-67ae-4668-956c-0025cc785212":
+    "ojobe.ekpor.ext@brightlysoftware.com",
+  "712020:9484d75f-f78a-4c62-86d5-e3202d55e129":
+    "kashish.goyal.ext@siemens.com",
+  "712020:98376025-a295-45d3-8479-a6c4c617708b":
+    "michael.johnson.ext@brightlysoftware.com",
+  "712020:5a76440b-b20f-4c76-9fe0-e08db894a301":
+    "nilesh.pore.ext@brightlysoftware.com",
+  "712020:9f4e93bd-1ced-489a-8034-3965e2ca3beb":
+    "touqeer.shakeel.ext@brightlysoftware.com",
+  "712020:b8298392-2a8a-4bc9-ae32-87f56ff8eb8e":
+    "bhanu.teja.ext@brightlysoftware.com",
 };
 
 // Comment indicators that a fix build/ZIP was delivered BEFORE closing
@@ -95,15 +105,17 @@ const PROCEDURE_PATTERNS = [
 const API_ALREADY_CORRECT_PATTERNS = [
   /\b(api|service|endpoint)\s+already\s+(return|respond|behav)/i,
   /\bI\s+am\s+not\s+able\s+to\s+reproduce\s+this\s+bug/i,
-  /\bwhen\s+I\s+invoke[d]?\s+the\b/i,  // developer showing API already correct
+  /\bwhen\s+I\s+invoke[d]?\s+the\b/i, // developer showing API already correct
 ];
 
 function commentHasFixDelivery(comments) {
-  return comments.some(c => FIX_DELIVERY_PATTERNS.some(p => p.test(c.body || '')));
+  return comments.some((c) =>
+    FIX_DELIVERY_PATTERNS.some((p) => p.test(c.body || "")),
+  );
 }
 
 function detectFalseFlag(issue) {
-  const flds    = issue.fields;
+  const flds = issue.fields;
   const comments = (flds.comment || {}).comments || [];
 
   // If any comment shows a fix was delivered (ZIP/build/branch), this is a real bug
@@ -113,18 +125,21 @@ function detectFalseFlag(issue) {
 
   // Check each comment for genuine false-flag signals
   for (const c of comments) {
-    const body       = c.body || '';
-    const authorId   = (c.author || {}).accountId || '';
-    const authorName = (c.author || {}).displayName || '';
-    const isDev      = DEV_IDS.has(authorId);
+    const body = c.body || "";
+    const authorId = (c.author || {}).accountId || "";
+    const authorName = (c.author || {}).displayName || "";
+    const isDev = DEV_IDS.has(authorId);
 
     // Pattern 1: Developer explicitly cannot reproduce
     for (const p of CANNOT_REPRODUCE_PATTERNS) {
       if (p.test(body)) {
         return {
           isFalseFlag: true,
-          category: 'Cannot Reproduce',
-          reason: `${authorName} (${isDev?'dev':'tester'}): "${body.replace(/<[^>]+>/g,'').substring(0,150).trim()}"`,
+          category: "Cannot Reproduce",
+          reason: `${authorName} (${isDev ? "dev" : "tester"}): "${body
+            .replace(/<[^>]+>/g, "")
+            .substring(0, 150)
+            .trim()}"`,
           commentAuthor: authorName,
           commentAuthorId: authorId,
         };
@@ -139,8 +154,11 @@ function detectFalseFlag(issue) {
         // Also accept tester closing with "working as expected" ONLY if no fix ZIP was provided
         return {
           isFalseFlag: true,
-          category: 'Working as Designed / Expected',
-          reason: `${authorName} (${isDev?'dev':'tester'}): "${body.replace(/<[^>]+>/g,'').substring(0,150).trim()}"`,
+          category: "Working as Designed / Expected",
+          reason: `${authorName} (${isDev ? "dev" : "tester"}): "${body
+            .replace(/<[^>]+>/g, "")
+            .substring(0, 150)
+            .trim()}"`,
           commentAuthor: authorName,
           commentAuthorId: authorId,
         };
@@ -152,8 +170,11 @@ function detectFalseFlag(issue) {
       if (p.test(body)) {
         return {
           isFalseFlag: true,
-          category: 'Tester Procedure Issue',
-          reason: `${authorName}: "${body.replace(/<[^>]+>/g,'').substring(0,150).trim()}"`,
+          category: "Tester Procedure Issue",
+          reason: `${authorName}: "${body
+            .replace(/<[^>]+>/g, "")
+            .substring(0, 150)
+            .trim()}"`,
           commentAuthor: authorName,
           commentAuthorId: authorId,
         };
@@ -166,8 +187,11 @@ function detectFalseFlag(issue) {
         if (p.test(body)) {
           return {
             isFalseFlag: true,
-            category: 'API Already Correct',
-            reason: `${authorName}: "${body.replace(/<[^>]+>/g,'').substring(0,150).trim()}"`,
+            category: "API Already Correct",
+            reason: `${authorName}: "${body
+              .replace(/<[^>]+>/g, "")
+              .substring(0, 150)
+              .trim()}"`,
             commentAuthor: authorName,
             commentAuthorId: authorId,
           };
@@ -181,13 +205,26 @@ function detectFalseFlag(issue) {
 
 function classifyDefect(summary) {
   const s = summary.toLowerCase();
-  if (/security|permission|breach|privilege|access denied|unauthorized/.test(s)) return 'Security';
-  if (/api|server error|500|graphql|endpoint|grpc|rest/.test(s)) return 'API / Backend';
-  if (/\bui\b|display|mismatch|label|button|scroll|pagination|layout|icon|dropdown|modal|dialog|screen|distort|tooltip|style|css/.test(s)) return 'UI / Frontend';
-  if (/validation|mandatory|required|invalid|error message|character limit|max.?length/.test(s)) return 'Validation';
-  if (/performance|slow|load/.test(s)) return 'Performance';
-  if (/delete|unable to delete|not able to delete|remove/.test(s)) return 'Data / CRUD';
-  return 'Functional';
+  if (/security|permission|breach|privilege|access denied|unauthorized/.test(s))
+    return "Security";
+  if (/api|server error|500|graphql|endpoint|grpc|rest/.test(s))
+    return "API / Backend";
+  if (
+    /\bui\b|display|mismatch|label|button|scroll|pagination|layout|icon|dropdown|modal|dialog|screen|distort|tooltip|style|css/.test(
+      s,
+    )
+  )
+    return "UI / Frontend";
+  if (
+    /validation|mandatory|required|invalid|error message|character limit|max.?length/.test(
+      s,
+    )
+  )
+    return "Validation";
+  if (/performance|slow|load/.test(s)) return "Performance";
+  if (/delete|unable to delete|not able to delete|remove/.test(s))
+    return "Data / CRUD";
+  return "Functional";
 }
 
 function daysBetween(a, b) {
@@ -209,18 +246,23 @@ const FILE_TO_DEV = [
   "712020:b8298392-2a8a-4bc9-ae32-87f56ff8eb8e",
 ];
 
-const allFiles = fs.readdirSync(BASE)
-  .filter(f => f.startsWith('mcp-atlassian-searchJiraIssuesUsingJql-') && f.endsWith('.txt'))
+const allFiles = fs
+  .readdirSync(BASE)
+  .filter(
+    (f) =>
+      f.startsWith("mcp-atlassian-searchJiraIssuesUsingJql-") &&
+      f.endsWith(".txt"),
+  )
   .sort();
 
-const allIssuesMap  = new Map(); // key → issue
-const issueToDevs   = new Map(); // key → Set<devId> that appeared in their "was assignee" results
+const allIssuesMap = new Map(); // key → issue
+const issueToDevs = new Map(); // key → Set<devId> that appeared in their "was assignee" results
 
 for (let i = 0; i < allFiles.length && i < FILE_TO_DEV.length; i++) {
   const devId = FILE_TO_DEV[i];
-  const arr   = JSON.parse(fs.readFileSync(path.join(BASE, allFiles[i]), 'utf8'));
+  const arr = JSON.parse(fs.readFileSync(path.join(BASE, allFiles[i]), "utf8"));
   const jiraText = arr.length > 1 ? arr[1].text : arr[0].text;
-  const issues   = (JSON.parse(jiraText)).issues || [];
+  const issues = JSON.parse(jiraText).issues || [];
   for (const issue of issues) {
     if (!allIssuesMap.has(issue.key)) allIssuesMap.set(issue.key, issue);
     if (!issueToDevs.has(issue.key)) issueToDevs.set(issue.key, new Set());
@@ -236,11 +278,13 @@ console.log(`Loaded ${allIssuesMap.size} unique issues`);
 //           (3) first dev appearing in the was-assignee query results.
 function determineOwner(issue) {
   const flds = issue.fields;
-  const currentId = (flds.assignee || {}).accountId || '';
+  const currentId = (flds.assignee || {}).accountId || "";
   if (DEV_IDS.has(currentId)) return currentId;
 
   // Fall back to "was assignee" results
-  const candidates = [...(issueToDevs.get(issue.key) || new Set())].filter(id => DEV_IDS.has(id));
+  const candidates = [...(issueToDevs.get(issue.key) || new Set())].filter(
+    (id) => DEV_IDS.has(id),
+  );
   if (candidates.length > 0) return candidates[0];
   return null;
 }
@@ -249,27 +293,46 @@ function determineOwner(issue) {
 const falseFlagList = [];
 const correctedDevData = {};
 for (const devId of Object.keys(DEVELOPERS)) {
-  correctedDevData[devId] = { name: DEVELOPERS[devId], email: DEVELOPER_EMAILS[devId], issues: [], total: 0 };
+  correctedDevData[devId] = {
+    name: DEVELOPERS[devId],
+    email: DEVELOPER_EMAILS[devId],
+    issues: [],
+    total: 0,
+  };
 }
 
 for (const [key, issue] of allIssuesMap) {
   const ownerDevId = determineOwner(issue);
   if (!ownerDevId) continue;
 
-  const flds    = issue.fields;
+  const flds = issue.fields;
   const comments = (flds.comment || {}).comments || [];
-  const status   = (flds.status || {}).name || 'Unknown';
-  const created  = flds.created;
-  const updated  = flds.updated;
-  const resdate  = flds.resolutiondate;
+  const status = (flds.status || {}).name || "Unknown";
+  const created = flds.created;
+  const updated = flds.updated;
+  const resdate = flds.resolutiondate;
 
-  const TESTING_STATUSES = new Set(['Ready for Testing','Done','Closed','Resolved','Verified','Fixed','In Testing','Development Complete']);
-  const timeToRft   = TESTING_STATUSES.has(status) ? daysBetween(created, updated) : null;
+  const TESTING_STATUSES = new Set([
+    "Ready for Testing",
+    "Done",
+    "Closed",
+    "Resolved",
+    "Verified",
+    "Fixed",
+    "In Testing",
+    "Development Complete",
+  ]);
+  const timeToRft = TESTING_STATUSES.has(status)
+    ? daysBetween(created, updated)
+    : null;
   const timeToClose = resdate ? daysBetween(created, resdate) : null;
 
-  let bounces = 0, lastRole = null;
+  let bounces = 0,
+    lastRole = null;
   for (const c of comments) {
-    const role = DEV_IDS.has((c.author||{}).accountId||'') ? 'dev' : 'tester';
+    const role = DEV_IDS.has((c.author || {}).accountId || "")
+      ? "dev"
+      : "tester";
     if (lastRole !== null && role !== lastRole) bounces++;
     lastRole = role;
   }
@@ -277,12 +340,14 @@ for (const [key, issue] of allIssuesMap) {
   // ── False flag detection ──
   const ff = detectFalseFlag(issue);
   if (ff.isFalseFlag) {
-    const devsForIssue = [...(issueToDevs.get(key)||new Set())].map(id=>DEVELOPERS[id]).filter(Boolean);
+    const devsForIssue = [...(issueToDevs.get(key) || new Set())]
+      .map((id) => DEVELOPERS[id])
+      .filter(Boolean);
     falseFlagList.push({
       key,
       summary: flds.summary,
       defectType: classifyDefect(flds.summary),
-      priority: (flds.priority||{}).name || 'Unknown',
+      priority: (flds.priority || {}).name || "Unknown",
       status,
       category: ff.category,
       reason: ff.reason,
@@ -295,27 +360,28 @@ for (const [key, issue] of allIssuesMap) {
     key,
     summary: flds.summary,
     defectType: classifyDefect(flds.summary),
-    priority: (flds.priority||{}).name || 'Unknown',
+    priority: (flds.priority || {}).name || "Unknown",
     status,
-    created, updated,
+    created,
+    updated,
     resolutiondate: resdate,
     assigneeId: ownerDevId,
     assigneeName: DEVELOPERS[ownerDevId],
-    reporterName: (flds.reporter||{}).displayName || 'Unknown',
-    timeToRftDays:   timeToRft   ? +timeToRft.toFixed(1)   : null,
+    reporterName: (flds.reporter || {}).displayName || "Unknown",
+    timeToRftDays: timeToRft ? +timeToRft.toFixed(1) : null,
     timeToCloseDays: timeToClose ? +timeToClose.toFixed(1) : null,
     bounces,
     commentCount: comments.length,
     isFalseFlag: ff.isFalseFlag,
     falseFlagCategory: ff.isFalseFlag ? ff.category : null,
-    falseFlagReason:   ff.isFalseFlag ? ff.reason   : null,
+    falseFlagReason: ff.isFalseFlag ? ff.reason : null,
   });
 }
 
 for (const d of Object.values(correctedDevData)) d.total = d.issues.length;
 
 // ── Save outputs ──────────────────────────────────────────────────────
-fs.writeFileSync(OUT_FF,    JSON.stringify(falseFlagList,    null, 2));
+fs.writeFileSync(OUT_FF, JSON.stringify(falseFlagList, null, 2));
 fs.writeFileSync(OUT_FIXED, JSON.stringify(correctedDevData, null, 2));
 
 // ── Print report ──────────────────────────────────────────────────────
@@ -326,14 +392,16 @@ for (const ff of falseFlagList) {
   byCategory[ff.category].push(ff);
 }
 
-console.log(`\n${'='.repeat(72)}`);
+console.log(`\n${"=".repeat(72)}`);
 console.log(`FALSE FLAGS: ${falseFlagList.length} total`);
-console.log('='.repeat(72));
+console.log("=".repeat(72));
 for (const [cat, items] of Object.entries(byCategory)) {
   console.log(`\n  ── ${cat} (${items.length}) ──`);
   for (const ff of items) {
-    console.log(`    ${ff.key} | ${ff.assignedDeveloper} | ${ff.priority} | ${ff.category}`);
-    console.log(`       ${ff.reason.substring(0,110)}`);
+    console.log(
+      `    ${ff.key} | ${ff.assignedDeveloper} | ${ff.priority} | ${ff.category}`,
+    );
+    console.log(`       ${ff.reason.substring(0, 110)}`);
   }
 }
 
@@ -343,27 +411,47 @@ for (const ff of falseFlagList) {
   if (!ffByDev[ff.assignedDeveloper]) ffByDev[ff.assignedDeveloper] = [];
   ffByDev[ff.assignedDeveloper].push(ff.key);
 }
-console.log(`\n${'='.repeat(72)}`);
-console.log('FALSE FLAGS PER DEVELOPER');
-console.log('='.repeat(72));
-for (const [dev, keys] of Object.entries(ffByDev).sort((a,b)=>b[1].length-a[1].length)) {
-  console.log(`  ${dev.padEnd(22)}: ${keys.length} — ${keys.join(', ')}`);
+console.log(`\n${"=".repeat(72)}`);
+console.log("FALSE FLAGS PER DEVELOPER");
+console.log("=".repeat(72));
+for (const [dev, keys] of Object.entries(ffByDev).sort(
+  (a, b) => b[1].length - a[1].length,
+)) {
+  console.log(`  ${dev.padEnd(22)}: ${keys.length} — ${keys.join(", ")}`);
 }
 
-console.log(`\n${'='.repeat(72)}`);
-console.log('CORRECTED DEVELOPER COUNTS');
-console.log('='.repeat(72));
-let grandTotal=0, grandFF=0, grandReal=0;
+console.log(`\n${"=".repeat(72)}`);
+console.log("CORRECTED DEVELOPER COUNTS");
+console.log("=".repeat(72));
+let grandTotal = 0,
+  grandFF = 0,
+  grandReal = 0;
 for (const [devId, d] of Object.entries(correctedDevData)) {
-  const real = d.issues.filter(i=>!i.isFalseFlag);
-  const ffs  = d.issues.filter(i=> i.isFalseFlag);
-  grandTotal += d.issues.length; grandFF += ffs.length; grandReal += real.length;
-  const avgBounces = d.issues.length ? (d.issues.reduce((s,i)=>s+i.bounces,0)/d.issues.length).toFixed(1) : '—';
-  const rft   = real.filter(i=>i.timeToRftDays!==null).map(i=>i.timeToRftDays);
-  const close = real.filter(i=>i.timeToCloseDays!==null).map(i=>i.timeToCloseDays);
-  const avgRft   = rft.length   ? (rft.reduce((a,b)=>a+b,0)/rft.length).toFixed(1)   : 'N/A';
-  const avgClose = close.length ? (close.reduce((a,b)=>a+b,0)/close.length).toFixed(1) : 'N/A';
-  console.log(`  ${d.name.padEnd(22)} total=${String(d.issues.length).padStart(3)} real=${String(real.length).padStart(3)} false=${String(ffs.length).padStart(2)} | avg_bounces=${avgBounces} | avg_rft=${avgRft}d | avg_close=${avgClose}d`);
+  const real = d.issues.filter((i) => !i.isFalseFlag);
+  const ffs = d.issues.filter((i) => i.isFalseFlag);
+  grandTotal += d.issues.length;
+  grandFF += ffs.length;
+  grandReal += real.length;
+  const avgBounces = d.issues.length
+    ? (d.issues.reduce((s, i) => s + i.bounces, 0) / d.issues.length).toFixed(1)
+    : "—";
+  const rft = real
+    .filter((i) => i.timeToRftDays !== null)
+    .map((i) => i.timeToRftDays);
+  const close = real
+    .filter((i) => i.timeToCloseDays !== null)
+    .map((i) => i.timeToCloseDays);
+  const avgRft = rft.length
+    ? (rft.reduce((a, b) => a + b, 0) / rft.length).toFixed(1)
+    : "N/A";
+  const avgClose = close.length
+    ? (close.reduce((a, b) => a + b, 0) / close.length).toFixed(1)
+    : "N/A";
+  console.log(
+    `  ${d.name.padEnd(22)} total=${String(d.issues.length).padStart(3)} real=${String(real.length).padStart(3)} false=${String(ffs.length).padStart(2)} | avg_bounces=${avgBounces} | avg_rft=${avgRft}d | avg_close=${avgClose}d`,
+  );
 }
-console.log(`  ${'─'.repeat(70)}`);
-console.log(`  TOTAL                   total=${grandTotal}  real=${grandReal}  false=${grandFF}`);
+console.log(`  ${"─".repeat(70)}`);
+console.log(
+  `  TOTAL                   total=${grandTotal}  real=${grandReal}  false=${grandFF}`,
+);
