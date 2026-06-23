@@ -8,10 +8,11 @@
  * Row markup (data-key, # cell, Edit button) is already emitted by generate_dashboard_v2.js,
  * so no regex row-injection is needed here.
  */
-const fs   = require('fs');
-const FILE = String.raw`C:\optimus-prime\mission\defect-analysis\defect_dashboard.html`;
+const fs = require("fs");
+const path = require("path");
+const FILE = path.join(__dirname, "defect_dashboard.html");
 
-let html = fs.readFileSync(FILE, 'utf8');
+let html = fs.readFileSync(FILE, "utf8");
 
 // ── 1. Inject CSS ──────────────────────────────────────────────────────────
 const newCSS = `
@@ -56,7 +57,7 @@ const newCSS = `
 .btn-cancel:hover{background:var(--border);}
 .reassign-badge{font-size:10px;}
 `;
-html = html.replace('</style>', newCSS + '\n</style>');
+html = html.replace("</style>", newCSS + "\n</style>");
 
 // ── 2. Inject modal HTML ───────────────────────────────────────────────────
 const modalHTML = `
@@ -95,7 +96,7 @@ const modalHTML = `
   </div>
 </div>
 `;
-html = html.replace('<footer>', modalHTML + '\n<footer>');
+html = html.replace("<footer>", modalHTML + "\n<footer>");
 
 // ── 3. Replace the JS block ────────────────────────────────────────────────
 // Use lastIndexOf so we target only the original tiny switchTab/toggleDev script at the
@@ -588,21 +589,25 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') closeEdit(); })
 
 function saveEdit(){
   if(!_editKey) return;
+  const key  = _editKey;
   const ovr  = getOverrides();
   const data = {
     assignee:    document.getElementById('edit-assignee').value,
     isFalseFlag: document.getElementById('edit-ff').checked,
     _savedAt:    new Date().toISOString(),
   };
-  ovr[_editKey] = data;
+  ovr[key] = data;
   saveOverrides(ovr);
 
-  applyOverrideToRow(_editKey, data);
+  // Notify real-time layer so server persists to edits.json and broadcasts.
+  document.dispatchEvent(new CustomEvent('cnf:edit', { detail: { key, data } }));
+
+  applyOverrideToRow(key, data);
   closeEdit();
   refreshAll();
 
   // Flash row
-  document.querySelectorAll(\`tr[data-key="\${_editKey}"]\`).forEach(r => {
+  document.querySelectorAll(\`tr[data-key="\${key}"]\`).forEach(r => {
     r.style.transition='background .1s';
     r.style.background='rgba(99,102,241,.25)';
     setTimeout(()=>{ r.style.background=''; }, 700);
@@ -623,11 +628,12 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 `;
 
-const lastScriptPos = html.lastIndexOf('<script>');
-if(lastScriptPos === -1) throw new Error('Could not find <script> block to replace');
-html = html.substring(0, lastScriptPos) + newScript + '\n</body></html>';
+const lastScriptPos = html.lastIndexOf("<script>");
+if (lastScriptPos === -1)
+  throw new Error("Could not find <script> block to replace");
+html = html.substring(0, lastScriptPos) + newScript + "\n</body></html>";
 
-fs.writeFileSync(FILE, html, 'utf8');
+fs.writeFileSync(FILE, html, "utf8");
 const size = (fs.statSync(FILE).size / 1024).toFixed(1);
 console.log(`Patched → ${FILE}`);
 console.log(`Size: ${size} KB`);

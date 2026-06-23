@@ -8,123 +8,221 @@
  *   5. Light/dark theme toggle
  * All edits stored in localStorage — no server needed.
  */
-const fs   = require('fs');
-const DATA = String.raw`C:\optimus-prime\mission\defect-analysis\dev_metrics_corrected.json`;
-const FF   = String.raw`C:\optimus-prime\mission\defect-analysis\false_flags.json`;
-const OUT  = String.raw`C:\optimus-prime\mission\defect-analysis\defect_dashboard.html`;
+const fs = require("fs");
+const path = require("path");
+const DATA = path.join(__dirname, "dev_metrics_corrected.json");
+const FF = path.join(__dirname, "false_flags.json");
+const OUT = path.join(__dirname, "defect_dashboard.html");
 
-const devData    = JSON.parse(fs.readFileSync(DATA, 'utf8'));
-const falseFlags = JSON.parse(fs.readFileSync(FF,   'utf8'));
-const ffKeys     = new Set(falseFlags.map(f => f.key));
+const devData = JSON.parse(fs.readFileSync(DATA, "utf8"));
+const falseFlags = JSON.parse(fs.readFileSync(FF, "utf8"));
+const ffKeys = new Set(falseFlags.map((f) => f.key));
 
 // ── helpers ──────────────────────────────────────────────────────────────
-const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
-const fmt = v  => v === null || v === undefined ? '—' : (typeof v==='number' ? v.toFixed(1) : v);
+const avg = (arr) =>
+  arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+const fmt = (v) =>
+  v === null || v === undefined
+    ? "—"
+    : typeof v === "number"
+      ? v.toFixed(1)
+      : v;
 
 function pBadge(p) {
-  const m={Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
-  return `<span class="badge" style="background:${m[p]||'#6b7280'}">${p}</span>`;
+  const m = {
+    Blocker: "#dc2626",
+    Urgent: "#ea580c",
+    High: "#d97706",
+    Medium: "#2563eb",
+    Low: "#16a34a",
+  };
+  return `<span class="badge" style="background:${m[p] || "#6b7280"}">${p}</span>`;
 }
 function sBadge(s) {
-  const m={'Development Complete':'#16a34a','Ready for Testing':'#2563eb','In Testing':'#7c3aed',
-    Done:'#059669',Closed:'#059669',Resolved:'#059669','In Development':'#f59e0b',
-    'Ready For Sprint':'#64748b',Blocked:'#dc2626'};
-  return `<span class="badge" style="background:${m[s]||'#64748b'}">${s}</span>`;
+  const m = {
+    "Development Complete": "#16a34a",
+    "Ready for Testing": "#2563eb",
+    "In Testing": "#7c3aed",
+    Done: "#059669",
+    Closed: "#059669",
+    Resolved: "#059669",
+    "In Development": "#f59e0b",
+    "Ready For Sprint": "#64748b",
+    Blocked: "#dc2626",
+  };
+  return `<span class="badge" style="background:${m[s] || "#64748b"}">${s}</span>`;
 }
 function tBadge(t) {
-  const m={'API / Backend':'#6366f1','UI / Frontend':'#ec4899',Security:'#dc2626',
-    Validation:'#f59e0b','Data / CRUD':'#0891b2',Performance:'#d97706',Functional:'#64748b'};
-  return `<span class="badge" style="background:${m[t]||'#64748b'}">${t}</span>`;
+  const m = {
+    "API / Backend": "#6366f1",
+    "UI / Frontend": "#ec4899",
+    Security: "#dc2626",
+    Validation: "#f59e0b",
+    "Data / CRUD": "#0891b2",
+    Performance: "#d97706",
+    Functional: "#64748b",
+  };
+  return `<span class="badge" style="background:${m[t] || "#64748b"}">${t}</span>`;
 }
 
-const typePalette   = {'API / Backend':'#6366f1','UI / Frontend':'#ec4899',Security:'#dc2626',Validation:'#f59e0b','Data / CRUD':'#0891b2',Performance:'#d97706',Functional:'#94a3b8'};
-const prioPalette   = {Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
-const statusPalette = {'Development Complete':'#16a34a','Ready for Testing':'#2563eb','In Testing':'#7c3aed',Done:'#059669',Closed:'#059669',Resolved:'#059669','In Development':'#f59e0b','Ready For Sprint':'#94a3b8',Blocked:'#dc2626'};
+const typePalette = {
+  "API / Backend": "#6366f1",
+  "UI / Frontend": "#ec4899",
+  Security: "#dc2626",
+  Validation: "#f59e0b",
+  "Data / CRUD": "#0891b2",
+  Performance: "#d97706",
+  Functional: "#94a3b8",
+};
+const prioPalette = {
+  Blocker: "#dc2626",
+  Urgent: "#ea580c",
+  High: "#d97706",
+  Medium: "#2563eb",
+  Low: "#16a34a",
+};
+const statusPalette = {
+  "Development Complete": "#16a34a",
+  "Ready for Testing": "#2563eb",
+  "In Testing": "#7c3aed",
+  Done: "#059669",
+  Closed: "#059669",
+  Resolved: "#059669",
+  "In Development": "#f59e0b",
+  "Ready For Sprint": "#94a3b8",
+  Blocked: "#dc2626",
+};
 
 function barChart(data, total, palette) {
-  return Object.entries(data).sort((a,b)=>b[1]-a[1]).map(([k,v]) => {
-    const pct = total>0 ? (v/total*100).toFixed(1) : 0;
-    return `<div class="bar-row">
+  return Object.entries(data)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, v]) => {
+      const pct = total > 0 ? ((v / total) * 100).toFixed(1) : 0;
+      return `<div class="bar-row">
   <span class="bar-label">${k}</span>
-  <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${palette[k]||'#64748b'}"></div></div>
+  <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${palette[k] || "#64748b"}"></div></div>
   <span class="bar-val">${v} <small>(${pct}%)</small></span>
 </div>`;
-  }).join('');
+    })
+    .join("");
 }
 
 // ── Aggregate ─────────────────────────────────────────────────────────────
 const devSummaries = [];
-let totalIssues=0, totalReal=0, totalFF=0;
+let totalIssues = 0,
+  totalReal = 0,
+  totalFF = 0;
 
 for (const [devId, d] of Object.entries(devData)) {
-  const all  = d.issues;
-  const real = all.filter(i=>!i.isFalseFlag);
-  const ffs  = all.filter(i=> i.isFalseFlag);
-  totalIssues += all.length; totalReal += real.length; totalFF += ffs.length;
+  const all = d.issues;
+  const real = all.filter((i) => !i.isFalseFlag);
+  const ffs = all.filter((i) => i.isFalseFlag);
+  totalIssues += all.length;
+  totalReal += real.length;
+  totalFF += ffs.length;
 
-  const byType={}, byPrio={}, byStatus={};
-  let maxBounce=0;
+  const byType = {},
+    byPrio = {},
+    byStatus = {};
+  let maxBounce = 0;
   for (const i of real) {
-    byType[i.defectType]=(byType[i.defectType]||0)+1;
-    byPrio[i.priority]=(byPrio[i.priority]||0)+1;
-    byStatus[i.status]=(byStatus[i.status]||0)+1;
-    if(i.bounces>maxBounce) maxBounce=i.bounces;
+    byType[i.defectType] = (byType[i.defectType] || 0) + 1;
+    byPrio[i.priority] = (byPrio[i.priority] || 0) + 1;
+    byStatus[i.status] = (byStatus[i.status] || 0) + 1;
+    if (i.bounces > maxBounce) maxBounce = i.bounces;
   }
-  const rftT  = real.filter(i=>i.timeToRftDays!==null).map(i=>i.timeToRftDays);
-  const closeT= real.filter(i=>i.timeToCloseDays!==null).map(i=>i.timeToCloseDays);
-  const avgRft  = avg(rftT),  avgClose = avg(closeT);
-  const avgBounces = real.length ? real.reduce((s,i)=>s+i.bounces,0)/real.length : 0;
-  const highBounce = real.reduce((b,i)=>i.bounces>(b?.bounces||0)?i:b, null);
+  const rftT = real
+    .filter((i) => i.timeToRftDays !== null)
+    .map((i) => i.timeToRftDays);
+  const closeT = real
+    .filter((i) => i.timeToCloseDays !== null)
+    .map((i) => i.timeToCloseDays);
+  const avgRft = avg(rftT),
+    avgClose = avg(closeT);
+  const avgBounces = real.length
+    ? real.reduce((s, i) => s + i.bounces, 0) / real.length
+    : 0;
+  const highBounce = real.reduce(
+    (b, i) => (i.bounces > (b?.bounces || 0) ? i : b),
+    null,
+  );
 
-  devSummaries.push({ devId, name:d.name, email:d.email,
-    total:all.length, realCount:real.length, ffCount:ffs.length,
-    byType, byPrio, byStatus,
-    avgBounces:+avgBounces.toFixed(1), maxBounce, highBounce,
-    avgRftDays: avgRft!==null?+avgRft.toFixed(1):null,
-    avgCloseDays: avgClose!==null?+avgClose.toFixed(1):null,
-    issues:all, realIssues:real, ffIssues:ffs });
+  devSummaries.push({
+    devId,
+    name: d.name,
+    email: d.email,
+    total: all.length,
+    realCount: real.length,
+    ffCount: ffs.length,
+    byType,
+    byPrio,
+    byStatus,
+    avgBounces: +avgBounces.toFixed(1),
+    maxBounce,
+    highBounce,
+    avgRftDays: avgRft !== null ? +avgRft.toFixed(1) : null,
+    avgCloseDays: avgClose !== null ? +avgClose.toFixed(1) : null,
+    issues: all,
+    realIssues: real,
+    ffIssues: ffs,
+  });
 }
 
-const allReal = devSummaries.flatMap(d=>d.realIssues.map(i=>({...i,devName:d.name})));
-const oType={}, oPrio={}, oStatus={};
-let oBounce=0; const oRft=[], oClose=[];
+const allReal = devSummaries.flatMap((d) =>
+  d.realIssues.map((i) => ({ ...i, devName: d.name })),
+);
+const oType = {},
+  oPrio = {},
+  oStatus = {};
+let oBounce = 0;
+const oRft = [],
+  oClose = [];
 for (const i of allReal) {
-  oType[i.defectType]=(oType[i.defectType]||0)+1;
-  oPrio[i.priority]=(oPrio[i.priority]||0)+1;
-  oStatus[i.status]=(oStatus[i.status]||0)+1;
-  oBounce+=i.bounces;
-  if(i.timeToRftDays!==null) oRft.push(i.timeToRftDays);
-  if(i.timeToCloseDays!==null) oClose.push(i.timeToCloseDays);
+  oType[i.defectType] = (oType[i.defectType] || 0) + 1;
+  oPrio[i.priority] = (oPrio[i.priority] || 0) + 1;
+  oStatus[i.status] = (oStatus[i.status] || 0) + 1;
+  oBounce += i.bounces;
+  if (i.timeToRftDays !== null) oRft.push(i.timeToRftDays);
+  if (i.timeToCloseDays !== null) oClose.push(i.timeToCloseDays);
 }
 
-const ffByCat={}, ffByDev={};
+const ffByCat = {},
+  ffByDev = {};
 for (const ff of falseFlags) {
-  (ffByCat[ff.category]||(ffByCat[ff.category]=[])).push(ff);
-  (ffByDev[ff.assignedDeveloper]||(ffByDev[ff.assignedDeveloper]=[])).push(ff);
+  (ffByCat[ff.category] || (ffByCat[ff.category] = [])).push(ff);
+  (ffByDev[ff.assignedDeveloper] || (ffByDev[ff.assignedDeveloper] = [])).push(
+    ff,
+  );
 }
 
 // ── Issue table row ────────────────────────────────────────────────────────
-let globalRowNum = 0;  // reset per devCard call — see devCard()
+let globalRowNum = 0; // reset per devCard call — see devCard()
 function issueRow(i, devName) {
   globalRowNum++;
-  const n    = globalRowNum;
+  const n = globalRowNum;
   const isFF = i.isFalseFlag;
-  const ffReason = isFF ? (falseFlags.find(f=>f.key===i.key)||{}).reason||'' : '';
-  const safeSummary = (i.summary||'').replace(/"/g,'&quot;').replace(/[<>]/g,'');
-  const display80   = (i.summary||'').substring(0,80) + ((i.summary||'').length>80?'…':'');
-  return `<tr data-key="${i.key}" data-dev="${devName}" class="${n%2===0?'row-even':'row-odd'}${isFF?' ff-row':''}">
+  const ffReason = isFF
+    ? (falseFlags.find((f) => f.key === i.key) || {}).reason || ""
+    : "";
+  const safeSummary = (i.summary || "")
+    .replace(/"/g, "&quot;")
+    .replace(/[<>]/g, "");
+  const display80 =
+    (i.summary || "").substring(0, 80) +
+    ((i.summary || "").length > 80 ? "…" : "");
+  return `<tr data-key="${i.key}" data-dev="${devName}" class="${n % 2 === 0 ? "row-even" : "row-odd"}${isFF ? " ff-row" : ""}">
   <td class="num-col">${n}</td>
-  <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/${i.key}" target="_blank" class="jira-link">${i.key}</a>${isFF?` <span class="edit-tag ff-tag">⚑</span>`:''}</td>
+  <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/${i.key}" target="_blank" class="jira-link">${i.key}</a>${isFF ? ` <span class="edit-tag ff-tag">⚑</span>` : ""}</td>
   <td class="summary-cell" data-full="${safeSummary}" title="${safeSummary}">${display80}</td>
   <td class="type-cell">${tBadge(i.defectType)}</td>
   <td class="prio-cell">${pBadge(i.priority)}</td>
   <td>${sBadge(i.status)}</td>
-  <td>${i.reporterName||'—'}</td>
+  <td>${i.reporterName || "—"}</td>
   <td>${fmt(i.timeToRftDays)}</td>
   <td>${fmt(i.timeToCloseDays)}</td>
-  <td class="${i.bounces>=3?'bounce-high':i.bounces>=1?'bounce-mid':'bounce-low'}">${i.bounces}</td>
+  <td class="${i.bounces >= 3 ? "bounce-high" : i.bounces >= 1 ? "bounce-mid" : "bounce-low"}">${i.bounces}</td>
   <td>${i.commentCount}</td>
-  <td class="ff-cell">${isFF?`<span class="badge" style="background:#7c3aed">${(i.falseFlagCategory||'Manual')}</span>`:'—'}</td>
+  <td class="ff-cell">${isFF ? `<span class="badge" style="background:#7c3aed">${i.falseFlagCategory || "Manual"}</span>` : "—"}</td>
   <td class="actions-cell"><button class="act-btn" onclick="openEdit(this)" title="Edit this defect">✏️ Edit</button></td>
 </tr>`;
 }
@@ -140,23 +238,44 @@ function issueTableHead() {
 
 // ── Developer card ─────────────────────────────────────────────────────────
 function devCard(ds, cardIdx) {
-  const initials = ds.name.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2);
-  const acs = ['#6366f1','#ec4899','#0891b2','#16a34a','#d97706','#7c3aed','#ea580c','#059669','#2563eb','#64748b'];
-  const ac  = acs[cardIdx % acs.length];
+  const initials = ds.name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .substring(0, 2);
+  const acs = [
+    "#6366f1",
+    "#ec4899",
+    "#0891b2",
+    "#16a34a",
+    "#d97706",
+    "#7c3aed",
+    "#ea580c",
+    "#059669",
+    "#2563eb",
+    "#64748b",
+  ];
+  const ac = acs[cardIdx % acs.length];
 
-  const ffNotice = ds.ffIssues.length ? `
+  const ffNotice = ds.ffIssues.length
+    ? `
   <div class="ff-notice">
     <strong>⚑ ${ds.ffIssues.length} False Flag(s)</strong> —
-    ${ds.ffIssues.map(i=>`<a href="https://brightlysoftware.atlassian.net/browse/${i.key}" target="_blank" class="jira-link">${i.key}</a>`).join(' · ')}
-  </div>` : '';
+    ${ds.ffIssues.map((i) => `<a href="https://brightlysoftware.atlassian.net/browse/${i.key}" target="_blank" class="jira-link">${i.key}</a>`).join(" · ")}
+  </div>`
+    : "";
 
-  const highCard = ds.highBounce && ds.maxBounce>0 ? `
+  const highCard =
+    ds.highBounce && ds.maxBounce > 0
+      ? `
   <div class="analysis-section highlight-card">
     <h4>⚡ Highest Bounce Issue</h4>
     <p><a href="https://brightlysoftware.atlassian.net/browse/${ds.highBounce.key}" target="_blank" class="jira-link">${ds.highBounce.key}</a></p>
-    <p class="small-text">${(ds.highBounce.summary||'').substring(0,100)}</p>
+    <p class="small-text">${(ds.highBounce.summary || "").substring(0, 100)}</p>
     <p><strong>${ds.maxBounce} bounces</strong> · ${ds.highBounce.commentCount} comments · ${sBadge(ds.highBounce.status)}</p>
-  </div>` : '';
+  </div>`
+      : "";
 
   return `
 <div class="dev-card" id="dev-${cardIdx}">
@@ -168,27 +287,27 @@ function devCard(ds, cardIdx) {
     </div>
     <div class="dev-stats-inline">
       <div class="stat-pill"><span class="stat-num">${ds.realCount}</span><span class="stat-lbl">Real</span></div>
-      <div class="stat-pill" ${ds.ffCount>0?'style="border-color:#7c3aed"':''}><span class="stat-num" ${ds.ffCount>0?'style="color:#a78bfa"':''}>${ds.ffCount}</span><span class="stat-lbl">False Flags</span></div>
+      <div class="stat-pill" ${ds.ffCount > 0 ? 'style="border-color:#7c3aed"' : ""}><span class="stat-num" ${ds.ffCount > 0 ? 'style="color:#a78bfa"' : ""}>${ds.ffCount}</span><span class="stat-lbl">False Flags</span></div>
       <div class="stat-pill"><span class="stat-num">${fmt(ds.avgBounces)}</span><span class="stat-lbl">Avg Bounces</span></div>
-      <div class="stat-pill"><span class="stat-num">${ds.avgRftDays!==null?fmt(ds.avgRftDays)+'d':'—'}</span><span class="stat-lbl">→RFT</span></div>
-      <div class="stat-pill"><span class="stat-num">${ds.avgCloseDays!==null?fmt(ds.avgCloseDays)+'d':'—'}</span><span class="stat-lbl">→Close</span></div>
-      <div class="stat-pill"><span class="stat-num ${ds.maxBounce>=5?'text-red':ds.maxBounce>=3?'text-orange':''}">${ds.maxBounce}</span><span class="stat-lbl">Max Bounce</span></div>
+      <div class="stat-pill"><span class="stat-num">${ds.avgRftDays !== null ? fmt(ds.avgRftDays) + "d" : "—"}</span><span class="stat-lbl">→RFT</span></div>
+      <div class="stat-pill"><span class="stat-num">${ds.avgCloseDays !== null ? fmt(ds.avgCloseDays) + "d" : "—"}</span><span class="stat-lbl">→Close</span></div>
+      <div class="stat-pill"><span class="stat-num ${ds.maxBounce >= 5 ? "text-red" : ds.maxBounce >= 3 ? "text-orange" : ""}">${ds.maxBounce}</span><span class="stat-lbl">Max Bounce</span></div>
     </div>
     <div class="chevron" id="chev-${cardIdx}">▼</div>
   </div>
   <div class="dev-body" id="body-${cardIdx}">
     ${ffNotice}
     <div class="analysis-grid">
-      <div class="analysis-section"><h4>Defect Types</h4>${barChart(ds.byType,ds.realCount,typePalette)}</div>
-      <div class="analysis-section"><h4>Priority</h4>${barChart(ds.byPrio,ds.realCount,prioPalette)}</div>
-      <div class="analysis-section"><h4>Status</h4>${barChart(ds.byStatus,ds.realCount,statusPalette)}</div>
+      <div class="analysis-section"><h4>Defect Types</h4>${barChart(ds.byType, ds.realCount, typePalette)}</div>
+      <div class="analysis-section"><h4>Priority</h4>${barChart(ds.byPrio, ds.realCount, prioPalette)}</div>
+      <div class="analysis-section"><h4>Status</h4>${barChart(ds.byStatus, ds.realCount, statusPalette)}</div>
       ${highCard}
     </div>
     <div class="table-wrapper">
       <table class="issue-table">
         ${issueTableHead()}
         <tbody>
-          ${(globalRowNum=0, ds.issues.map(i=>issueRow(i,ds.name)).join('\n          '))}
+          ${((globalRowNum = 0), ds.issues.map((i) => issueRow(i, ds.name)).join("\n          "))}
         </tbody>
       </table>
     </div>
@@ -200,33 +319,37 @@ function devCard(ds, cardIdx) {
 function lbCard(title, rows) {
   return `<div class="lb-card"><h3>${title}</h3><table><tbody>${rows}</tbody></table></div>`;
 }
-function lbRow(rank, name, val, valClass='') {
-  const rkColors = ['#f59e0b','#94a3b8','#b45309'];
-  const bg = rank<=3 ? rkColors[rank-1] : '#64748b';
+function lbRow(rank, name, val, valClass = "") {
+  const rkColors = ["#f59e0b", "#94a3b8", "#b45309"];
+  const bg = rank <= 3 ? rkColors[rank - 1] : "#64748b";
   return `<tr><td><span class="rank" style="background:${bg}">${rank}</span></td><td>${name}</td><td class="${valClass}"><strong>${val}</strong></td></tr>`;
 }
 
 // ── Overview summary table ─────────────────────────────────────────────────
 function overviewRow(d, idx) {
-  const topType = Object.entries(d.byType).sort((a,b)=>b[1]-a[1])[0];
-  const bl=d.byPrio['Blocker']||0, ur=d.byPrio['Urgent']||0;
-  return `<tr class="${idx%2===0?'row-even':'row-odd'}">
+  const topType = Object.entries(d.byType).sort((a, b) => b[1] - a[1])[0];
+  const bl = d.byPrio["Blocker"] || 0,
+    ur = d.byPrio["Urgent"] || 0;
+  return `<tr class="${idx % 2 === 0 ? "row-even" : "row-odd"}">
   <td><strong>${d.name}</strong></td>
   <td style="color:var(--text2);font-size:11px">${d.email}</td>
   <td style="text-align:center">${d.total}</td>
   <td style="text-align:center"><strong>${d.realCount}</strong></td>
-  <td style="text-align:center;color:${d.ffCount>0?'var(--purple)':''}">${d.ffCount||0}</td>
-  <td>${topType?tBadge(topType[0]):'—'}</td>
-  <td style="text-align:center" class="${d.avgBounces>=3?'bounce-high':d.avgBounces>=1.5?'bounce-mid':'bounce-low'}">${fmt(d.avgBounces)}</td>
-  <td style="text-align:center" class="${d.maxBounce>=5?'bounce-high':d.maxBounce>=3?'bounce-mid':'bounce-low'}">${d.maxBounce}</td>
-  <td style="text-align:center">${d.avgRftDays!==null?fmt(d.avgRftDays):'—'}</td>
-  <td style="text-align:center">${d.avgCloseDays!==null?fmt(d.avgCloseDays):'—'}</td>
-  <td style="text-align:center" class="${bl>0?'bounce-high':''}">${bl}</td>
-  <td style="text-align:center" class="${ur>3?'bounce-mid':''}">${ur}</td>
+  <td style="text-align:center;color:${d.ffCount > 0 ? "var(--purple)" : ""}">${d.ffCount || 0}</td>
+  <td>${topType ? tBadge(topType[0]) : "—"}</td>
+  <td style="text-align:center" class="${d.avgBounces >= 3 ? "bounce-high" : d.avgBounces >= 1.5 ? "bounce-mid" : "bounce-low"}">${fmt(d.avgBounces)}</td>
+  <td style="text-align:center" class="${d.maxBounce >= 5 ? "bounce-high" : d.maxBounce >= 3 ? "bounce-mid" : "bounce-low"}">${d.maxBounce}</td>
+  <td style="text-align:center">${d.avgRftDays !== null ? fmt(d.avgRftDays) : "—"}</td>
+  <td style="text-align:center">${d.avgCloseDays !== null ? fmt(d.avgCloseDays) : "—"}</td>
+  <td style="text-align:center" class="${bl > 0 ? "bounce-high" : ""}">${bl}</td>
+  <td style="text-align:center" class="${ur > 3 ? "bounce-mid" : ""}">${ur}</td>
 </tr>`;
 }
 
-const generatedAt = new Date().toLocaleString('en-GB',{dateStyle:'long',timeStyle:'short'});
+const generatedAt = new Date().toLocaleString("en-GB", {
+  dateStyle: "long",
+  timeStyle: "short",
+});
 
 // ─────────────────────────────────────────────────────────────────────────
 const html = `<!DOCTYPE html>
@@ -427,11 +550,11 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <div class="kpi-card"><div class="kpi-num">${totalReal}</div><div class="kpi-lbl">Real Defects</div></div>
   <div class="kpi-card ff-card"><div class="kpi-num purple">${totalFF}</div><div class="kpi-lbl">False Flags</div></div>
   <div class="kpi-card"><div class="kpi-num">10</div><div class="kpi-lbl">Developers</div></div>
-  <div class="kpi-card"><div class="kpi-num">${allReal.length>0?(oBounce/allReal.length).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Bounces/Issue</div></div>
-  <div class="kpi-card"><div class="kpi-num">${oRft.length>0?avg(oRft).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Days → RFT</div></div>
-  <div class="kpi-card"><div class="kpi-num">${oClose.length>0?avg(oClose).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Days → Close</div></div>
-  <div class="kpi-card"><div class="kpi-num">${oStatus['Development Complete']||0}</div><div class="kpi-lbl">Dev Complete</div></div>
-  <div class="kpi-card"><div class="kpi-num">${(oStatus['Ready for Testing']||0)+(oStatus['In Testing']||0)}</div><div class="kpi-lbl">In Testing</div></div>
+  <div class="kpi-card"><div class="kpi-num">${allReal.length > 0 ? (oBounce / allReal.length).toFixed(1) : "—"}</div><div class="kpi-lbl">Avg Bounces/Issue</div></div>
+  <div class="kpi-card"><div class="kpi-num">${oRft.length > 0 ? avg(oRft).toFixed(1) : "—"}</div><div class="kpi-lbl">Avg Days → RFT</div></div>
+  <div class="kpi-card"><div class="kpi-num">${oClose.length > 0 ? avg(oClose).toFixed(1) : "—"}</div><div class="kpi-lbl">Avg Days → Close</div></div>
+  <div class="kpi-card"><div class="kpi-num">${oStatus["Development Complete"] || 0}</div><div class="kpi-lbl">Dev Complete</div></div>
+  <div class="kpi-card"><div class="kpi-num">${(oStatus["Ready for Testing"] || 0) + (oStatus["In Testing"] || 0)}</div><div class="kpi-lbl">In Testing</div></div>
 </div>
 
 <!-- Tabs -->
@@ -446,9 +569,9 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 <div class="tab-panel active" id="tab-overview">
   <h2 class="section-title">Overall Defect Distribution</h2>
   <div class="chart-grid">
-    <div class="chart-card"><h3>By Defect Type</h3>${barChart(oType,totalReal,typePalette)}</div>
-    <div class="chart-card"><h3>By Priority</h3>${barChart(oPrio,totalReal,prioPalette)}</div>
-    <div class="chart-card"><h3>By Status</h3>${barChart(oStatus,totalReal,statusPalette)}</div>
+    <div class="chart-card"><h3>By Defect Type</h3>${barChart(oType, totalReal, typePalette)}</div>
+    <div class="chart-card"><h3>By Priority</h3>${barChart(oPrio, totalReal, prioPalette)}</div>
+    <div class="chart-card"><h3>By Status</h3>${barChart(oStatus, totalReal, statusPalette)}</div>
   </div>
   <h2 class="section-title">Developer Summary</h2>
   <div class="table-wrapper">
@@ -457,7 +580,10 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <th>Developer</th><th>Email</th><th>Total</th><th>Real</th><th style="color:var(--purple)">False Flags</th>
         <th>Top Type</th><th>Avg Bounces</th><th>Max Bounce</th><th>Avg→RFT</th><th>Avg→Close</th><th>Blockers</th><th>Urgent</th>
       </tr></thead>
-      <tbody>${devSummaries.sort((a,b)=>b.realCount-a.realCount).map((d,i)=>overviewRow(d,i)).join('\n      ')}</tbody>
+      <tbody>${devSummaries
+        .sort((a, b) => b.realCount - a.realCount)
+        .map((d, i) => overviewRow(d, i))
+        .join("\n      ")}</tbody>
     </table>
   </div>
 </div>
@@ -465,44 +591,116 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 <!-- ── Developer detail tab ── -->
 <div class="tab-panel" id="tab-developers">
   <input type="text" class="search-bar" id="devSearch" placeholder="🔍 Filter by key, summary, status, type…" oninput="filterIssues(this.value)">
-  ${devSummaries.sort((a,b)=>b.realCount-a.realCount).map((d,i)=>devCard(d,i)).join('\n  ')}
+  ${devSummaries
+    .sort((a, b) => b.realCount - a.realCount)
+    .map((d, i) => devCard(d, i))
+    .join("\n  ")}
 </div>
 
 <!-- ── Leaderboard tab ── -->
 <div class="tab-panel" id="tab-leaderboard">
   <h2 class="section-title">Performance Leaderboards</h2>
   <div class="lb-grid">
-    ${lbCard('🔢 Most Real Defects',
-      [...devSummaries].sort((a,b)=>b.realCount-a.realCount).map((d,i)=>lbRow(i+1,d.name,d.realCount)).join(''))}
-    ${lbCard('⚡ Avg Bounces (lower = better)',
-      [...devSummaries].sort((a,b)=>a.avgBounces-b.avgBounces).map((d,i)=>lbRow(i+1,d.name,fmt(d.avgBounces),d.avgBounces>=3?'bounce-high':d.avgBounces>=1.5?'bounce-mid':'')).join(''))}
-    ${lbCard('⏱ Fastest to Ready for Testing',
-      [...devSummaries].filter(d=>d.avgRftDays!==null).sort((a,b)=>a.avgRftDays-b.avgRftDays)
-        .map((d,i)=>lbRow(i+1,d.name,fmt(d.avgRftDays)+' d')).join('') +
-      devSummaries.filter(d=>d.avgRftDays===null).map(d=>`<tr><td><span class="rank" style="background:#475569">—</span></td><td>${d.name}</td><td style="color:var(--text2)">No data</td></tr>`).join(''))}
-    ${lbCard('✅ Fastest to Close',
-      [...devSummaries].filter(d=>d.avgCloseDays!==null).sort((a,b)=>a.avgCloseDays-b.avgCloseDays)
-        .map((d,i)=>lbRow(i+1,d.name,fmt(d.avgCloseDays)+' d')).join(''))}
-    ${lbCard('🚨 Most Blockers',
-      [...devSummaries].sort((a,b)=>(b.byPrio['Blocker']||0)-(a.byPrio['Blocker']||0))
-        .map((d,i)=>lbRow(i+1,d.name,d.byPrio['Blocker']||0,(d.byPrio['Blocker']||0)>3?'bounce-high':'')).join(''))}
-    ${lbCard('🔴 Max Single-Issue Bounces',
-      [...devSummaries].sort((a,b)=>b.maxBounce-a.maxBounce)
-        .map((d,i)=>lbRow(i+1,`${d.name}${d.highBounce?` <span style="color:var(--text2);font-size:11px">(${d.highBounce.key})</span>`:''}`,d.maxBounce,d.maxBounce>=8?'bounce-high':d.maxBounce>=5?'bounce-mid':'')).join(''))}
+    ${lbCard(
+      "🔢 Most Real Defects",
+      [...devSummaries]
+        .sort((a, b) => b.realCount - a.realCount)
+        .map((d, i) => lbRow(i + 1, d.name, d.realCount))
+        .join(""),
+    )}
+    ${lbCard(
+      "⚡ Avg Bounces (lower = better)",
+      [...devSummaries]
+        .sort((a, b) => a.avgBounces - b.avgBounces)
+        .map((d, i) =>
+          lbRow(
+            i + 1,
+            d.name,
+            fmt(d.avgBounces),
+            d.avgBounces >= 3
+              ? "bounce-high"
+              : d.avgBounces >= 1.5
+                ? "bounce-mid"
+                : "",
+          ),
+        )
+        .join(""),
+    )}
+    ${lbCard(
+      "⏱ Fastest to Ready for Testing",
+      [...devSummaries]
+        .filter((d) => d.avgRftDays !== null)
+        .sort((a, b) => a.avgRftDays - b.avgRftDays)
+        .map((d, i) => lbRow(i + 1, d.name, fmt(d.avgRftDays) + " d"))
+        .join("") +
+        devSummaries
+          .filter((d) => d.avgRftDays === null)
+          .map(
+            (d) =>
+              `<tr><td><span class="rank" style="background:#475569">—</span></td><td>${d.name}</td><td style="color:var(--text2)">No data</td></tr>`,
+          )
+          .join(""),
+    )}
+    ${lbCard(
+      "✅ Fastest to Close",
+      [...devSummaries]
+        .filter((d) => d.avgCloseDays !== null)
+        .sort((a, b) => a.avgCloseDays - b.avgCloseDays)
+        .map((d, i) => lbRow(i + 1, d.name, fmt(d.avgCloseDays) + " d"))
+        .join(""),
+    )}
+    ${lbCard(
+      "🚨 Most Blockers",
+      [...devSummaries]
+        .sort((a, b) => (b.byPrio["Blocker"] || 0) - (a.byPrio["Blocker"] || 0))
+        .map((d, i) =>
+          lbRow(
+            i + 1,
+            d.name,
+            d.byPrio["Blocker"] || 0,
+            (d.byPrio["Blocker"] || 0) > 3 ? "bounce-high" : "",
+          ),
+        )
+        .join(""),
+    )}
+    ${lbCard(
+      "🔴 Max Single-Issue Bounces",
+      [...devSummaries]
+        .sort((a, b) => b.maxBounce - a.maxBounce)
+        .map((d, i) =>
+          lbRow(
+            i + 1,
+            `${d.name}${d.highBounce ? ` <span style="color:var(--text2);font-size:11px">(${d.highBounce.key})</span>` : ""}`,
+            d.maxBounce,
+            d.maxBounce >= 8
+              ? "bounce-high"
+              : d.maxBounce >= 5
+                ? "bounce-mid"
+                : "",
+          ),
+        )
+        .join(""),
+    )}
   </div>
   <h2 class="section-title">All High-Bounce Issues (≥ 4)</h2>
   <div class="table-wrapper">
     <table class="issue-table">
       <thead><tr><th>#</th><th>Key</th><th>Developer</th><th>Summary</th><th>Type</th><th>Priority</th><th>Status</th><th>Bounces</th><th>Cmts</th></tr></thead>
-      <tbody>${allReal.filter(i=>i.bounces>=4).sort((a,b)=>b.bounces-a.bounces).map((i,idx)=>`
-      <tr class="${idx%2===0?'row-even':'row-odd'}">
-        <td class="num-col">${idx+1}</td>
+      <tbody>${allReal
+        .filter((i) => i.bounces >= 4)
+        .sort((a, b) => b.bounces - a.bounces)
+        .map(
+          (i, idx) => `
+      <tr class="${idx % 2 === 0 ? "row-even" : "row-odd"}">
+        <td class="num-col">${idx + 1}</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/${i.key}" target="_blank" class="jira-link">${i.key}</a></td>
         <td>${i.devName}</td>
-        <td class="summary-cell" title="${i.summary}">${i.summary.substring(0,70)}${i.summary.length>70?'…':''}</td>
+        <td class="summary-cell" title="${i.summary}">${i.summary.substring(0, 70)}${i.summary.length > 70 ? "…" : ""}</td>
         <td>${tBadge(i.defectType)}</td><td>${pBadge(i.priority)}</td><td>${sBadge(i.status)}</td>
         <td class="bounce-high">${i.bounces}</td><td>${i.commentCount}</td>
-      </tr>`).join('')}
+      </tr>`,
+        )
+        .join("")}
       </tbody>
     </table>
   </div>
@@ -516,28 +714,45 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
     behaviour was already correct/by design, issue could not be reproduced (environment-specific),
     or tester used incorrect procedure. Issues where a fix build was delivered first are <em>excluded</em>.
   </p>
-  ${Object.entries(ffByCat).map(([cat,items])=>`
+  ${Object.entries(ffByCat)
+    .map(
+      ([cat, items]) => `
   <div class="ff-category-card">
-    <h3>${cat==='Cannot Reproduce'?'🔍':cat==='Tester Procedure Issue'?'📋':'✅'} ${cat} — ${items.length}</h3>
-    ${items.map(ff=>`
+    <h3>${cat === "Cannot Reproduce" ? "🔍" : cat === "Tester Procedure Issue" ? "📋" : "✅"} ${cat} — ${items.length}</h3>
+    ${items
+      .map(
+        (ff) => `
     <div class="ff-item">
       <a href="https://brightlysoftware.atlassian.net/browse/${ff.key}" target="_blank" class="jira-link">${ff.key}</a>
       ${pBadge(ff.priority)} ${tBadge(ff.defectType)}
       <strong style="margin-left:8px">${ff.assignedDeveloper}</strong>
-      <span style="color:var(--text2);margin-left:8px;font-size:12px">${ff.summary.substring(0,80)}${ff.summary.length>80?'…':''}</span>
-      <div class="ff-evidence">"${ff.reason.substring(0,180)}${ff.reason.length>180?'…':''}"</div>
-    </div>`).join('')}
-  </div>`).join('')}
+      <span style="color:var(--text2);margin-left:8px;font-size:12px">${ff.summary.substring(0, 80)}${ff.summary.length > 80 ? "…" : ""}</span>
+      <div class="ff-evidence">"${ff.reason.substring(0, 180)}${ff.reason.length > 180 ? "…" : ""}"</div>
+    </div>`,
+      )
+      .join("")}
+  </div>`,
+    )
+    .join("")}
   <h2 class="section-title" style="margin-top:32px">False Flags by Developer</h2>
   <div class="lb-grid">
-    ${Object.entries(ffByDev).sort((a,b)=>b[1].length-a[1].length).map(([dev,ffs])=>`
+    ${Object.entries(ffByDev)
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(
+        ([dev, ffs]) => `
     <div class="lb-card" style="border-color:var(--purple)">
       <h3 style="color:var(--purple)">${dev} — ${ffs.length}</h3>
-      <table><tbody>${ffs.map(ff=>`
+      <table><tbody>${ffs
+        .map(
+          (ff) => `
       <tr><td><a href="https://brightlysoftware.atlassian.net/browse/${ff.key}" target="_blank" class="jira-link">${ff.key}</a></td>
-      <td>${pBadge(ff.priority)}</td><td style="font-size:11px;color:var(--text2)">${ff.category}</td></tr>`).join('')}
+      <td>${pBadge(ff.priority)}</td><td style="font-size:11px;color:var(--text2)">${ff.category}</td></tr>`,
+        )
+        .join("")}
       </tbody></table>
-    </div>`).join('')}
+    </div>`,
+      )
+      .join("")}
   </div>
 </div>
 
@@ -551,7 +766,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
     <div class="form-row">
       <label>Assigned Developer</label>
       <select id="edit-assignee">
-        ${devSummaries.map(d=>`<option value="${d.name}">${d.name}</option>`).join('\n        ')}
+        ${devSummaries.map((d) => `<option value="${d.name}">${d.name}</option>`).join("\n        ")}
       </select>
     </div>
 
@@ -599,7 +814,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 const PRIO_CLR  = {Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
 const TYPE_CLR  = {'API / Backend':'#6366f1','UI / Frontend':'#ec4899',Security:'#dc2626',
   Validation:'#f59e0b','Data / CRUD':'#0891b2',Performance:'#d97706',Functional:'#94a3b8'};
-const DEV_NAMES = ${JSON.stringify(devSummaries.map(d=>d.name))};
+const DEV_NAMES = ${JSON.stringify(devSummaries.map((d) => d.name))};
 
 // ── theme ──────────────────────────────────────────────────────────────────
 (function(){ applyTheme(localStorage.getItem('cnf-theme')||'dark'); })();
@@ -900,7 +1115,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body></html>`;
 
-fs.writeFileSync(OUT, html, 'utf8');
-const sz = (fs.statSync(OUT).size/1024).toFixed(1);
-console.log('Written → ' + OUT);
-console.log('Size: ' + sz + ' KB');
+fs.writeFileSync(OUT, html, "utf8");
+const sz = (fs.statSync(OUT).size / 1024).toFixed(1);
+console.log("Written → " + OUT);
+console.log("Size: " + sz + " KB");

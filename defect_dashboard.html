@@ -7406,21 +7406,25 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') closeEdit(); })
 
 function saveEdit(){
   if(!_editKey) return;
+  const key  = _editKey;
   const ovr  = getOverrides();
   const data = {
     assignee:    document.getElementById('edit-assignee').value,
     isFalseFlag: document.getElementById('edit-ff').checked,
     _savedAt:    new Date().toISOString(),
   };
-  ovr[_editKey] = data;
+  ovr[key] = data;
   saveOverrides(ovr);
 
-  applyOverrideToRow(_editKey, data);
+  // Notify real-time layer so server persists to edits.json and broadcasts.
+  document.dispatchEvent(new CustomEvent('cnf:edit', { detail: { key, data } }));
+
+  applyOverrideToRow(key, data);
   closeEdit();
   refreshAll();
 
   // Flash row
-  document.querySelectorAll(`tr[data-key="${_editKey}"]`).forEach(r => {
+  document.querySelectorAll(`tr[data-key="${key}"]`).forEach(r => {
     r.style.transition='background .1s';
     r.style.background='rgba(99,102,241,.25)';
     setTimeout(()=>{ r.style.background=''; }, 700);
