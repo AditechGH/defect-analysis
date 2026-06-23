@@ -471,7 +471,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 <!-- ── Leaderboard tab ── -->
 <div class="tab-panel" id="tab-leaderboard">
   <h2 class="section-title">Performance Leaderboards</h2>
-  <div class="lb-grid">
+  <div class="lb-grid" id="lb-cards-grid">
     ${lbCard('🔢 Most Real Defects',
       [...devSummaries].sort((a,b)=>b.realCount-a.realCount).map((d,i)=>lbRow(i+1,d.name,d.realCount)).join(''))}
     ${lbCard('⚡ Avg Bounces (lower = better)',
@@ -516,11 +516,11 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
     behaviour was already correct/by design, issue could not be reproduced (environment-specific),
     or tester used incorrect procedure. Issues where a fix build was delivered first are <em>excluded</em>.
   </p>
-  ${Object.entries(ffByCat).map(([cat,items])=>`
-  <div class="ff-category-card">
+  <div id="ff-sections">${Object.entries(ffByCat).map(([cat,items])=>`
+  <div class="ff-category-card" data-ff-cat="${cat}">
     <h3>${cat==='Cannot Reproduce'?'🔍':cat==='Tester Procedure Issue'?'📋':'✅'} ${cat} — ${items.length}</h3>
     ${items.map(ff=>`
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="${ff.key}" data-ff-dev="${ff.assignedDeveloper}" data-ff-cat="${cat}" data-ff-prio="${ff.priority}" data-ff-type="${ff.defectType}">
       <a href="https://brightlysoftware.atlassian.net/browse/${ff.key}" target="_blank" class="jira-link">${ff.key}</a>
       ${pBadge(ff.priority)} ${tBadge(ff.defectType)}
       <strong style="margin-left:8px">${ff.assignedDeveloper}</strong>
@@ -528,8 +528,9 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
       <div class="ff-evidence">"${ff.reason.substring(0,180)}${ff.reason.length>180?'…':''}"</div>
     </div>`).join('')}
   </div>`).join('')}
+  </div>
   <h2 class="section-title" style="margin-top:32px">False Flags by Developer</h2>
-  <div class="lb-grid">
+  <div class="lb-grid" id="ff-by-dev-grid">
     ${Object.entries(ffByDev).sort((a,b)=>b[1].length-a[1].length).map(([dev,ffs])=>`
     <div class="lb-card" style="border-color:var(--purple)">
       <h3 style="color:var(--purple)">${dev} — ${ffs.length}</h3>
@@ -701,17 +702,30 @@ function refreshAllStats(){
   document.querySelectorAll('.dev-card').forEach(card=>{
     const devName=card.querySelector('.dev-info h3')?.textContent?.trim()||'';
     let total=0, real=0, ffs=0, bounceSum=0;
+    let maxBounce=0, maxBounceKey='', rftSum=0, rftCount=0, closeSum=0, closeCount=0;
+    let blockers=0;
     card.querySelectorAll('tr[data-key]').forEach(row=>{
       if(row.style.display==='none') return;
       total++;
       const isFF=row.classList.contains('ff-row');
       if(isFF) ffs++; else real++;
-      // bounces are in col 9
+      // col 9 = bounces, col 7 = rft days, col 8 = close days, col 4 = priority badge
       const b=parseInt(row.cells[9]?.textContent||'0')||0;
       bounceSum+=b;
+      if(!isFF){
+        if(b>maxBounce){ maxBounce=b; maxBounceKey=row.dataset.key||''; }
+        const rft=parseFloat(row.cells[7]?.textContent||'');
+        if(!isNaN(rft)){ rftSum+=rft; rftCount++; }
+        const cl=parseFloat(row.cells[8]?.textContent||'');
+        if(!isNaN(cl)){ closeSum+=cl; closeCount++; }
+        const prioText=row.cells[4]?.textContent?.trim()||'';
+        if(prioText==='Blocker') blockers++;
+      }
     });
     const avgBounces=total?+(bounceSum/total).toFixed(1):0;
-    devStats[devName]={total,real,ffs,avgBounces};
+    const avgRft=rftCount?+(rftSum/rftCount).toFixed(1):null;
+    const avgClose=closeCount?+(closeSum/closeCount).toFixed(1):null;
+    devStats[devName]={total,real,ffs,avgBounces,maxBounce,maxBounceKey,avgRft,avgClose,blockers};
 
     // Update stat-pills inside this card's header
     const pills=card.querySelectorAll('.stat-pill');
@@ -758,6 +772,157 @@ function refreshAllStats(){
       t.textContent=\`⚑ False Flags (\${grandFF})\`;
     }
   });
+
+  // Keep leaderboard and false-flags panels in sync
+  refreshLeaderboard(devStats);
+  refreshFalseFlags();
+}
+
+// ── Rebuild leaderboard cards from live devStats ───────────────────────────
+function refreshLeaderboard(devStats){
+  const grid=document.getElementById('lb-cards-grid');
+  if(!grid) return;
+
+  const rkClr=['#f59e0b','#94a3b8','#b45309'];
+  function rank(bg,n){ return \`<span class="rank" style="background:\${bg}">\${n}</span>\`; }
+  function lbRowHtml(i,name,val,cls=''){
+    const bg=i<3?rkClr[i]:'#64748b';
+    return \`<tr><td>\${rank(bg,i+1)}</td><td>\${name}</td><td class="\${cls}"><strong>\${val}</strong></td></tr>\`;
+  }
+  function card(title,rows){
+    return \`<div class="lb-card"><h3>\${title}</h3><table><tbody>\${rows}</tbody></table></div>\`;
+  }
+  const fmt1=v=>v===null||v===undefined?'—':typeof v==='number'?v.toFixed(1):v;
+  const entries=Object.entries(devStats);
+
+  // 1 – Most Real Defects
+  const byReal=[...entries].sort((a,b)=>b[1].real-a[1].real);
+  const c1=card('🔢 Most Real Defects',
+    byReal.map(([name,s],i)=>lbRowHtml(i,name,s.real)).join(''));
+
+  // 2 – Avg Bounces (lower = better)
+  const byBounce=[...entries].sort((a,b)=>a[1].avgBounces-b[1].avgBounces);
+  const c2=card('⚡ Avg Bounces (lower = better)',
+    byBounce.map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgBounces),s.avgBounces>=3?'bounce-high':s.avgBounces>=1.5?'bounce-mid':'')).join(''));
+
+  // 3 – Fastest to RFT
+  const withRft=entries.filter(([,s])=>s.avgRft!==null).sort((a,b)=>a[1].avgRft-b[1].avgRft);
+  const noRft =entries.filter(([,s])=>s.avgRft===null);
+  const c3=card('⏱ Fastest to Ready for Testing',
+    withRft.map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgRft)+' d')).join('')+
+    noRft.map(([name])=>\`<tr><td><span class="rank" style="background:#475569">—</span></td><td>\${name}</td><td style="color:var(--text2)">No data</td></tr>\`).join(''));
+
+  // 4 – Fastest to Close
+  const withClose=entries.filter(([,s])=>s.avgClose!==null).sort((a,b)=>a[1].avgClose-b[1].avgClose);
+  const c4=card('✅ Fastest to Close',
+    withClose.map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgClose)+' d')).join(''));
+
+  // 5 – Most Blockers
+  const byBlockers=[...entries].sort((a,b)=>b[1].blockers-a[1].blockers);
+  const c5=card('🚨 Most Blockers',
+    byBlockers.map(([name,s],i)=>lbRowHtml(i,name,s.blockers,s.blockers>3?'bounce-high':'')).join(''));
+
+  // 6 – Max Single-Issue Bounces
+  const byMaxBounce=[...entries].sort((a,b)=>b[1].maxBounce-a[1].maxBounce);
+  const c6=card('🔴 Max Single-Issue Bounces',
+    byMaxBounce.map(([name,s],i)=>{
+      const label=name+(s.maxBounceKey?\` <span style="color:var(--text2);font-size:11px">(\${s.maxBounceKey})</span>\`:'');
+      return lbRowHtml(i,label,s.maxBounce,s.maxBounce>=8?'bounce-high':s.maxBounce>=5?'bounce-mid':'');
+    }).join(''));
+
+  grid.innerHTML=c1+c2+c3+c4+c5+c6;
+}
+
+// ── Rebuild false-flags sections from live ff-row state ────────────────────
+// Evidence text is preserved via data attributes stamped at generation time.
+function refreshFalseFlags(){
+  const sections=document.getElementById('ff-sections');
+  const byDevGrid=document.getElementById('ff-by-dev-grid');
+  if(!sections || !byDevGrid) return;
+
+  // Collect live false-flag rows from developer cards
+  const ffByCat={}, ffByDev={};
+  document.querySelectorAll('#tab-developers tr[data-key].ff-row').forEach(row=>{
+    if(row.style.display==='none') return;
+    const key   = row.dataset.key||'';
+    const dev   = row.dataset.dev||row.closest('.dev-card')?.querySelector('.dev-info h3')?.textContent?.trim()||'';
+    // Try to read category from ff-cell badge (col 11)
+    const catEl = row.cells[11]?.querySelector('.badge');
+    const cat   = catEl?.textContent?.trim()||'Manual';
+    const prio  = row.cells[4]?.querySelector('.badge')?.textContent?.trim()||'';
+    const type  = row.cells[3]?.querySelector('.badge')?.textContent?.trim()||'';
+    const summary = row.cells[2]?.dataset?.full || row.cells[2]?.textContent?.trim()||'';
+
+    // Recover evidence from the original ff-item element (it still exists in DOM,
+    // just the category headings are rebuilt — keep items as-is, only update headers)
+    const entry={key,dev,cat,prio,type,summary};
+    (ffByCat[cat]||(ffByCat[cat]=[])).push(entry);
+    (ffByDev[dev] ||(ffByDev[dev] =[])).push(entry);
+  });
+
+  // Rebuild category cards — preserve inner ff-item nodes (they have the evidence text),
+  // only update the heading count and create/remove category blocks as needed.
+  const catOrder=['Tester Procedure Issue','Working as Designed / Expected','Cannot Reproduce','API Already Correct','Environment / Config Issue','Manual'];
+  const catIcon={
+    'Cannot Reproduce':'🔍','Tester Procedure Issue':'📋',
+    'API Already Correct':'🔧','Environment / Config Issue':'⚙️',
+  };
+  function catHdIcon(c){ return catIcon[c]||'✅'; }
+
+  // Index existing ff-item nodes by key so we can reuse them
+  const existingItems={};
+  sections.querySelectorAll('.ff-item[data-ff-key]').forEach(el=>{
+    existingItems[el.dataset.ffKey]=el;
+  });
+
+  // Build new category blocks, reusing preserved item nodes
+  const allCats=[...new Set([...catOrder,...Object.keys(ffByCat)])].filter(c=>ffByCat[c]);
+  sections.innerHTML=allCats.map(cat=>{
+    const items=ffByCat[cat]||[];
+    const itemsHtml=items.map(({key,dev,prio,type,summary})=>{
+      if(existingItems[key]){
+        // Reuse the original node — update dev name in case of reassignment
+        const orig=existingItems[key];
+        const devEl=orig.querySelector('strong');
+        if(devEl) devEl.textContent=dev;
+        return orig.outerHTML;
+      }
+      // Fallback for manually-flagged items with no original node
+      const prioBg={Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
+      const typeBg={'API / Backend':'#6366f1','UI / Frontend':'#ec4899',Security:'#dc2626',
+        Validation:'#f59e0b','Data / CRUD':'#0891b2',Functional:'#94a3b8'};
+      return \`<div class="ff-item" data-ff-key="\${key}" data-ff-dev="\${dev}" data-ff-cat="\${cat}">
+        <a href="https://brightlysoftware.atlassian.net/browse/\${key}" target="_blank" class="jira-link">\${key}</a>
+        <span class="badge" style="background:\${prioBg[prio]||'#64748b'}">\${prio}</span>
+        <span class="badge" style="background:\${typeBg[type]||'#94a3b8'}">\${type}</span>
+        <strong style="margin-left:8px">\${dev}</strong>
+        <span style="color:var(--text2);margin-left:8px;font-size:12px">\${summary.substring(0,80)}\${summary.length>80?'…':''}</span>
+      </div>\`;
+    }).join('');
+    return \`<div class="ff-category-card" data-ff-cat="\${cat}">
+      <h3>\${catHdIcon(cat)} \${cat} — \${items.length}</h3>
+      \${itemsHtml}
+    </div>\`;
+  }).join('');
+
+  // Update false-flags-by-developer grid
+  const prioBg={Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
+  byDevGrid.innerHTML=Object.entries(ffByDev).sort((a,b)=>b[1].length-a[1].length).map(([dev,ffs])=>\`
+    <div class="lb-card" style="border-color:var(--purple)">
+      <h3 style="color:var(--purple)">\${dev} — \${ffs.length}</h3>
+      <table><tbody>\${ffs.map(f=>\`
+        <tr>
+          <td><a href="https://brightlysoftware.atlassian.net/browse/\${f.key}" target="_blank" class="jira-link">\${f.key}</a></td>
+          <td><span class="badge" style="background:\${prioBg[f.prio]||'#64748b'}">\${f.prio}</span></td>
+          <td style="font-size:11px;color:var(--text2)">\${f.cat}</td>
+        </tr>\`).join('')}
+      </tbody></table>
+    </div>\`).join('');
+
+  // Update the section title count
+  const titleEl=document.querySelector('#tab-falseflags h2.section-title');
+  const total=Object.values(ffByCat).reduce((s,a)=>s+a.length,0);
+  if(titleEl) titleEl.textContent=\`⚑ False Flag Defects — \${total} Identified\`;
 }
 
 // ── row numbering ──────────────────────────────────────────────────────────
