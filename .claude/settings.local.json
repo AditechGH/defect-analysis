@@ -9,7 +9,9 @@
       "PowerShell(\\(Get-Content \"C:\\\\optimus-prime\\\\mission\\\\defect-analysis\\\\defect_dashboard.html\" -Raw\\).Length)",
       "PowerShell(gh auth *)",
       "PowerShell(Test-NetConnection *)",
-      "PowerShell(Get-Content *)"
+      "PowerShell(Get-Content *)",
+      "Bash(git rm *)",
+      "Bash(git commit -m 'Add .gitignore; stop tracking node_modules and data JSON files *)"
     ]
   }
 }
