@@ -11,7 +11,17 @@
       "PowerShell(Test-NetConnection *)",
       "PowerShell(Get-Content *)",
       "Bash(git rm *)",
-      "Bash(git commit -m 'Add .gitignore; stop tracking node_modules and data JSON files *)"
+      "Bash(git commit -m 'Add .gitignore; stop tracking node_modules and data JSON files *)",
+      "Bash(node -e ' *)",
+      "Bash(git commit -m 'Fix leaderboard and false-flags panels not reflecting edits *)",
+      "Bash(node -e \"require\\('fs'\\).existsSync\\('dev_metrics_corrected.json'\\) && require\\('fs'\\).existsSync\\('false_flags.json'\\) ? console.log\\('OK'\\) : console.log\\('MISSING'\\)\")",
+      "Bash(find . -name \"*.csv\" -not -path \"./node_modules/*\")",
+      "Bash(ls -la *.csv)",
+      "Bash(awk -F',' '{print $1}' JIRA.csv)",
+      "Bash(git checkout *)",
+      "Bash(git commit -m 'Merge remote refactors; keep local leaderboard and false-flags fix *)",
+      "Bash(git push *)",
+      "WebFetch(domain:defect-analysis.onrender.com)"
     ]
   }
 }

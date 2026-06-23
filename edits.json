@@ -1,0 +1,443 @@
+{
+  "CNF-59981": {
+    "assignee": "Abubakar Adamu",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-22T19:55:49.472Z"
+  },
+  "CNF-57811": {
+    "assignee": "Abubakar Adamu",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-22T19:57:38.999Z"
+  },
+  "CNF-57798": {
+    "assignee": "Abubakar Adamu",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-22T20:03:49.054Z"
+  },
+  "CNF-58730": {
+    "assignee": "Michael Johnson",
+    "isFalseFlag": true,
+    "ffCat": "Manual",
+    "ffNotes": "",
+    "_edited": true,
+    "_ts": "2026-06-22T20:11:18.603Z"
+  },
+  "CNF-58480": {
+    "assignee": "Michael Johnson",
+    "isFalseFlag": true,
+    "ffCat": "Manual",
+    "ffNotes": "",
+    "_edited": true,
+    "_ts": "2026-06-22T20:12:35.623Z"
+  },
+  "CNF-58070": {
+    "assignee": "Michael Johnson",
+    "isFalseFlag": true,
+    "ffCat": "Manual",
+    "ffNotes": "",
+    "_edited": true,
+    "_ts": "2026-06-22T20:27:32.082Z"
+  },
+  "CNF-60229": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:55:20.356Z"
+  },
+  "CNF-59882": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:56:20.410Z"
+  },
+  "CNF-58709": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:56:37.223Z"
+  },
+  "CNF-59853": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:57:03.395Z"
+  },
+  "CNF-53090": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:59:24.137Z"
+  },
+  "CNF-53091": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:59:32.380Z"
+  },
+  "CNF-53131": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:59:39.024Z"
+  },
+  "CNF-53149": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:59:46.075Z"
+  },
+  "CNF-53243": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T04:59:53.632Z"
+  },
+  "CNF-53544": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:00:10.103Z"
+  },
+  "CNF-53661": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:00:32.257Z"
+  },
+  "CNF-54179": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:00:44.100Z"
+  },
+  "CNF-54180": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:01:09.022Z"
+  },
+  "CNF-54182": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:02:16.252Z"
+  },
+  "CNF-54183": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:02:46.191Z"
+  },
+  "CNF-54947": {
+    "assignee": "Abubakar Adamu",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:03:11.183Z"
+  },
+  "CNF-54995": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:03:35.061Z"
+  },
+  "CNF-55052": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:04:04.428Z"
+  },
+  "CNF-55054": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:04:09.690Z"
+  },
+  "CNF-55465": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:04:38.128Z"
+  },
+  "CNF-55466": {
+    "assignee": "Touqeer Shakeel",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:05:01.549Z"
+  },
+  "CNF-55925": {
+    "assignee": "Bhanu Teja",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:05:32.616Z"
+  },
+  "CNF-56200": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:06:10.504Z"
+  },
+  "CNF-56449": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:06:15.649Z"
+  },
+  "CNF-56522": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:06:43.333Z"
+  },
+  "CNF-56523": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:07:10.794Z"
+  },
+  "CNF-56534": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:07:36.273Z"
+  },
+  "CNF-56536": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:07:55.262Z"
+  },
+  "CNF-56661": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:08:19.082Z"
+  },
+  "CNF-56843": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:08:50.280Z"
+  },
+  "CNF-56846": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:08:57.742Z"
+  },
+  "CNF-56918": {
+    "assignee": "Bhanu Teja",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:09:29.888Z"
+  },
+  "CNF-58142": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:10:04.237Z"
+  },
+  "CNF-58705": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:11:38.225Z"
+  },
+  "CNF-57310": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:12:21.806Z"
+  },
+  "CNF-57314": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:12:45.760Z"
+  },
+  "CNF-57774": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:12:54.643Z"
+  },
+  "CNF-58071": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:13:11.777Z"
+  },
+  "CNF-58131": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:13:18.964Z"
+  },
+  "CNF-58138": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:13:50.401Z"
+  },
+  "CNF-59520": {
+    "assignee": "Emmy Bbaale",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T05:14:10.556Z"
+  },
+
+  "CNF-58699": {
+    "assignee": "Touqeer Shakeel",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T14:22:53.600Z"
+  },
+  "CNF-58226": {
+    "assignee": "Michael Johnson",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T14:29:02.154Z"
+  },
+  "CNF-58218": {
+    "assignee": "Michael Johnson",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T14:30:03.748Z"
+  },
+  "CNF-55482": {
+    "assignee": "Adinan Alhassan",
+    "isFalseFlag": true,
+    "ffCat": "Manual",
+    "ffNotes": "",
+    "_edited": true,
+    "_ts": "2026-06-23T14:33:20.774Z"
+  },
+  "CNF-56659": {
+    "assignee": "Michael Johnson",
+    "isFalseFlag": false,
+    "ffCat": null,
+    "ffNotes": null,
+    "_edited": true,
+    "_ts": "2026-06-23T14:32:07.994Z"
+  },
+  "CNF-59489": {
+    "assignee": "Adinan Alhassan",
+    "isFalseFlag": true,
+    "ffCat": "Working as Designed / Expected",
+    "ffNotes": "",
+    "_edited": true,
+    "_ts": "2026-06-23T14:48:41.063Z"
+  },
+  "CNF-55197": {
+    "assignee": "Bhanu Teja",
+    "isFalseFlag": true,
+    "ffCat": "Working as Designed / Expected",
+    "ffNotes": "It's not in our current work scope",
+    "_edited": true,
+    "_ts": "2026-06-23T14:50:49.561Z"
+  },
+  "CNF-54987": {
+    "assignee": "Adinan Alhassan",
+    "isFalseFlag": true,
+    "ffCat": "Working as Designed / Expected",
+    "ffNotes": "",
+    "_edited": true,
+    "_ts": "2026-06-23T15:02:59.485Z"
+  }
+}
