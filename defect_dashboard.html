@@ -6544,7 +6544,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 <!-- ── Leaderboard tab ── -->
 <div class="tab-panel" id="tab-leaderboard">
   <h2 class="section-title">Performance Leaderboards</h2>
-  <div class="lb-grid">
+  <div class="lb-grid" id="lb-cards-grid">
     <div class="lb-card"><h3>🔢 Most Real Defects</h3><table><tbody><tr><td><span class="rank" style="background:#f59e0b">1</span></td><td>Abenezer Bayu</td><td class=""><strong>45</strong></td></tr><tr><td><span class="rank" style="background:#94a3b8">2</span></td><td>Emmy Bbaale</td><td class=""><strong>45</strong></td></tr><tr><td><span class="rank" style="background:#b45309">3</span></td><td>Michael Johnson</td><td class=""><strong>41</strong></td></tr><tr><td><span class="rank" style="background:#64748b">4</span></td><td>Nilesh Pore</td><td class=""><strong>41</strong></td></tr><tr><td><span class="rank" style="background:#64748b">5</span></td><td>Bhanu Teja</td><td class=""><strong>40</strong></td></tr><tr><td><span class="rank" style="background:#64748b">6</span></td><td>Adinan Alhassan</td><td class=""><strong>34</strong></td></tr><tr><td><span class="rank" style="background:#64748b">7</span></td><td>Touqeer Shakeel</td><td class=""><strong>34</strong></td></tr><tr><td><span class="rank" style="background:#64748b">8</span></td><td>Kashish Goyal</td><td class=""><strong>23</strong></td></tr><tr><td><span class="rank" style="background:#64748b">9</span></td><td>Abubakar Adamu</td><td class=""><strong>20</strong></td></tr><tr><td><span class="rank" style="background:#64748b">10</span></td><td>Ojobe Ekpor</td><td class=""><strong>9</strong></td></tr></tbody></table></div>
     <div class="lb-card"><h3>⚡ Avg Bounces (lower = better)</h3><table><tbody><tr><td><span class="rank" style="background:#f59e0b">1</span></td><td>Bhanu Teja</td><td class=""><strong>0.1</strong></td></tr><tr><td><span class="rank" style="background:#94a3b8">2</span></td><td>Ojobe Ekpor</td><td class=""><strong>0.2</strong></td></tr><tr><td><span class="rank" style="background:#b45309">3</span></td><td>Touqeer Shakeel</td><td class=""><strong>0.9</strong></td></tr><tr><td><span class="rank" style="background:#64748b">4</span></td><td>Abenezer Bayu</td><td class=""><strong>1.0</strong></td></tr><tr><td><span class="rank" style="background:#64748b">5</span></td><td>Emmy Bbaale</td><td class=""><strong>1.0</strong></td></tr><tr><td><span class="rank" style="background:#64748b">6</span></td><td>Adinan Alhassan</td><td class=""><strong>1.0</strong></td></tr><tr><td><span class="rank" style="background:#64748b">7</span></td><td>Nilesh Pore</td><td class=""><strong>1.4</strong></td></tr><tr><td><span class="rank" style="background:#64748b">8</span></td><td>Kashish Goyal</td><td class="bounce-mid"><strong>1.7</strong></td></tr><tr><td><span class="rank" style="background:#64748b">9</span></td><td>Michael Johnson</td><td class="bounce-mid"><strong>1.9</strong></td></tr><tr><td><span class="rank" style="background:#64748b">10</span></td><td>Abubakar Adamu</td><td class="bounce-mid"><strong>1.9</strong></td></tr></tbody></table></div>
     <div class="lb-card"><h3>⏱ Fastest to Ready for Testing</h3><table><tbody><tr><td><span class="rank" style="background:#f59e0b">1</span></td><td>Ojobe Ekpor</td><td class=""><strong>4.6 d</strong></td></tr><tr><td><span class="rank" style="background:#94a3b8">2</span></td><td>Touqeer Shakeel</td><td class=""><strong>6.2 d</strong></td></tr><tr><td><span class="rank" style="background:#b45309">3</span></td><td>Adinan Alhassan</td><td class=""><strong>9.1 d</strong></td></tr><tr><td><span class="rank" style="background:#64748b">4</span></td><td>Nilesh Pore</td><td class=""><strong>9.7 d</strong></td></tr><tr><td><span class="rank" style="background:#64748b">5</span></td><td>Bhanu Teja</td><td class=""><strong>9.7 d</strong></td></tr><tr><td><span class="rank" style="background:#64748b">6</span></td><td>Michael Johnson</td><td class=""><strong>9.9 d</strong></td></tr><tr><td><span class="rank" style="background:#64748b">7</span></td><td>Abenezer Bayu</td><td class=""><strong>15.6 d</strong></td></tr><tr><td><span class="rank" style="background:#64748b">8</span></td><td>Emmy Bbaale</td><td class=""><strong>16.7 d</strong></td></tr><tr><td><span class="rank" style="background:#64748b">9</span></td><td>Abubakar Adamu</td><td class=""><strong>17.1 d</strong></td></tr><tr><td><span class="rank" style="background:#64748b">10</span></td><td>Kashish Goyal</td><td class=""><strong>20.6 d</strong></td></tr></tbody></table></div>
@@ -6754,11 +6754,12 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
     behaviour was already correct/by design, issue could not be reproduced (environment-specific),
     or tester used incorrect procedure. Issues where a fix build was delivered first are <em>excluded</em>.
   </p>
+  <div id="ff-sections">
   
   <div class="ff-category-card">
     <h3>📋 Tester Procedure Issue — 1</h3>
     
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-55482">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-55482" target="_blank" class="jira-link">CNF-55482</a>
       <span class="badge" style="background:#dc2626">Blocker</span> <span class="badge" style="background:#dc2626">Security</span>
       <strong style="margin-left:8px">Adinan Alhassan</strong>
@@ -6775,14 +6776,14 @@ To ensure the changes take effect:
   <div class="ff-category-card">
     <h3>✅ Working as Designed / Expected — 6</h3>
     
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-54986">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-54986" target="_blank" class="jira-link">CNF-54986</a>
       <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#64748b">Functional</span>
       <strong style="margin-left:8px">Adinan Alhassan</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">User is not able to add same job(for which user is creating job precedence) in j…</span>
       <div class="ff-evidence">"adinan alhassan (dev): "@ambika mehra This is the expected behavior. Kindly test the legacy application again. This only occurs when you add a committed job in the succeeding""</div>
     </div>
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-54929">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-54929" target="_blank" class="jira-link">CNF-54929</a>
       <span class="badge" style="background:#dc2626">Blocker</span> <span class="badge" style="background:#dc2626">Security</span>
       <strong style="margin-left:8px">Emmy Bbaale</strong>
@@ -6791,7 +6792,7 @@ To ensure the changes take effect:
 
 If a user does not have _View_ permission for a particular lookup, they are still a""</div>
     </div>
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-54925">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-54925" target="_blank" class="jira-link">CNF-54925</a>
       <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#f59e0b">Validation</span>
       <strong style="margin-left:8px">Emmy Bbaale</strong>
@@ -6800,7 +6801,7 @@ If a user does not have _View_ permission for a particular lookup, they are stil
 
 Closing this defect""</div>
     </div>
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-58124">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-58124" target="_blank" class="jira-link">CNF-58124</a>
       <span class="badge" style="background:#dc2626">Blocker</span> <span class="badge" style="background:#6366f1">API / Backend</span>
       <strong style="margin-left:8px">Michael Johnson</strong>
@@ -6809,14 +6810,14 @@ Closing this defect""</div>
 
 ![](blob:https://medi""</div>
     </div>
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-57522">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-57522" target="_blank" class="jira-link">CNF-57522</a>
       <span class="badge" style="background:#16a34a">Low</span> <span class="badge" style="background:#ec4899">UI / Frontend</span>
       <strong style="margin-left:8px">Nilesh Pore</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">On Marking priority from Dead to non dead with toggle button, 2 confirmation pop…</span>
       <div class="ff-evidence">"nilesh pore (dev): "This is expected behavior: the user performed two actions, so two success messages appear. Each success message disappears after a set time. If the us""</div>
     </div>
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-60645">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-60645" target="_blank" class="jira-link">CNF-60645</a>
       <span class="badge" style="background:#2563eb">Medium</span> <span class="badge" style="background:#f59e0b">Validation</span>
       <strong style="margin-left:8px">Touqeer Shakeel</strong>
@@ -6829,21 +6830,21 @@ Closing this defect""</div>
   <div class="ff-category-card">
     <h3>🔍 Cannot Reproduce — 3</h3>
     
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-60486">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-60486" target="_blank" class="jira-link">CNF-60486</a>
       <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#f59e0b">Validation</span>
       <strong style="margin-left:8px">Touqeer Shakeel</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">[Financial Period] - Unable to create Finance Period within valid Finance Year —…</span>
       <div class="ff-evidence">"touqeer shakeel (dev): "@Prabhat Gaddam please check, I am unable to reproduce this.""</div>
     </div>
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-60178">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-60178" target="_blank" class="jira-link">CNF-60178</a>
       <span class="badge" style="background:#2563eb">Medium</span> <span class="badge" style="background:#64748b">Functional</span>
       <strong style="margin-left:8px">Bhanu Teja</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">[Contract Creation] - Web is allowing to allot a contractor to new contract, ent…</span>
       <div class="ff-evidence">"Mahipal Rathore (tester): "Issue not reproducible on oracle setup, env issue, closing the bug.""</div>
     </div>
-    <div class="ff-item">
+    <div class="ff-item" data-ff-key="CNF-59629">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-59629" target="_blank" class="jira-link">CNF-59629</a>
       <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#6366f1">API / Backend</span>
       <strong style="margin-left:8px">Bhanu Teja</strong>
@@ -6851,8 +6852,9 @@ Closing this defect""</div>
       <div class="ff-evidence">"Mahipal Rathore (tester): "Issue not reproducible on NB05 server. Closing the defect.""</div>
     </div>
   </div>
+    </div>
   <h2 class="section-title" style="margin-top:32px">False Flags by Developer</h2>
-  <div class="lb-grid">
+  <div class="lb-grid" id="ff-by-dev-grid">
     
     <div class="lb-card" style="border-color:var(--purple)">
       <h3 style="color:var(--purple)">Adinan Alhassan — 2</h3>
@@ -7076,17 +7078,28 @@ function refreshAllStats(){
   document.querySelectorAll('.dev-card').forEach(card=>{
     const devName=card.querySelector('.dev-info h3')?.textContent?.trim()||'';
     let total=0, real=0, ffs=0, bounceSum=0;
+    let maxBounce=0, maxBounceKey='', rftSum=0, rftCount=0, closeSum=0, closeCount=0, blockers=0;
     card.querySelectorAll('tr[data-key]').forEach(row=>{
       if(row.style.display==='none') return;
       total++;
       const isFF=row.classList.contains('ff-row');
       if(isFF) ffs++; else real++;
-      // bounces are in col 9
+      // col 9=bounces, col 7=rft days, col 8=close days, col 4=priority badge
       const b=parseInt(row.cells[9]?.textContent||'0')||0;
       bounceSum+=b;
+      if(!isFF){
+        if(b>maxBounce){ maxBounce=b; maxBounceKey=row.dataset.key||''; }
+        const rft=parseFloat(row.cells[7]?.textContent||'');
+        if(!isNaN(rft)){ rftSum+=rft; rftCount++; }
+        const cl=parseFloat(row.cells[8]?.textContent||'');
+        if(!isNaN(cl)){ closeSum+=cl; closeCount++; }
+        if((row.cells[4]?.textContent||'').trim()==='Blocker') blockers++;
+      }
     });
     const avgBounces=total?+(bounceSum/total).toFixed(1):0;
-    devStats[devName]={total,real,ffs,avgBounces};
+    const avgRft=rftCount?+(rftSum/rftCount).toFixed(1):null;
+    const avgClose=closeCount?+(closeSum/closeCount).toFixed(1):null;
+    devStats[devName]={total,real,ffs,avgBounces,maxBounce,maxBounceKey,avgRft,avgClose,blockers};
 
     // Update stat-pills inside this card's header
     const pills=card.querySelectorAll('.stat-pill');
@@ -7133,6 +7146,141 @@ function refreshAllStats(){
       t.textContent=`⚑ False Flags (${grandFF})`;
     }
   });
+
+  // Keep leaderboard and false-flags panels in sync with edits
+  refreshLeaderboard(devStats);
+  refreshFalseFlags();
+}
+
+// ── Rebuild leaderboard cards from live devStats ───────────────────────────
+function refreshLeaderboard(devStats){
+  const grid=document.getElementById('lb-cards-grid');
+  if(!grid) return;
+  const rkClr=['#f59e0b','#94a3b8','#b45309'];
+  const fmt1=v=>v===null||v===undefined?'—':typeof v==='number'?v.toFixed(1):v;
+  function lbRowHtml(i,name,val,cls=''){
+    const bg=i<3?rkClr[i]:'#64748b';
+    return `<tr><td><span class="rank" style="background:${bg}">${i+1}</span></td><td>${name}</td><td class="${cls}"><strong>${val}</strong></td></tr>`;
+  }
+  function card(title,rows){
+    return `<div class="lb-card"><h3>${title}</h3><table><tbody>${rows}</tbody></table></div>`;
+  }
+  const entries=Object.entries(devStats);
+
+  // 1 – Most Real Defects
+  const c1=card('🔢 Most Real Defects',
+    [...entries].sort((a,b)=>b[1].real-a[1].real)
+      .map(([name,s],i)=>lbRowHtml(i,name,s.real)).join(''));
+
+  // 2 – Avg Bounces (lower = better)
+  const c2=card('⚡ Avg Bounces (lower = better)',
+    [...entries].sort((a,b)=>a[1].avgBounces-b[1].avgBounces)
+      .map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgBounces),s.avgBounces>=3?'bounce-high':s.avgBounces>=1.5?'bounce-mid':'')).join(''));
+
+  // 3 – Fastest to RFT
+  const withRft=entries.filter(([,s])=>s.avgRft!==null).sort((a,b)=>a[1].avgRft-b[1].avgRft);
+  const noRft=entries.filter(([,s])=>s.avgRft===null);
+  const c3=card('⏱ Fastest to Ready for Testing',
+    withRft.map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgRft)+' d')).join('')+
+    noRft.map(([name])=>`<tr><td><span class="rank" style="background:#475569">—</span></td><td>${name}</td><td style="color:var(--text2)">No data</td></tr>`).join(''));
+
+  // 4 – Fastest to Close
+  const c4=card('✅ Fastest to Close',
+    entries.filter(([,s])=>s.avgClose!==null).sort((a,b)=>a[1].avgClose-b[1].avgClose)
+      .map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgClose)+' d')).join(''));
+
+  // 5 – Most Blockers
+  const c5=card('🚨 Most Blockers',
+    [...entries].sort((a,b)=>b[1].blockers-a[1].blockers)
+      .map(([name,s],i)=>lbRowHtml(i,name,s.blockers,s.blockers>3?'bounce-high':'')).join(''));
+
+  // 6 – Max Single-Issue Bounces
+  const c6=card('🔴 Max Single-Issue Bounces',
+    [...entries].sort((a,b)=>b[1].maxBounce-a[1].maxBounce)
+      .map(([name,s],i)=>{
+        const label=name+(s.maxBounceKey?` <span style="color:var(--text2);font-size:11px">(${s.maxBounceKey})</span>`:'');
+        return lbRowHtml(i,label,s.maxBounce,s.maxBounce>=8?'bounce-high':s.maxBounce>=5?'bounce-mid':'');
+      }).join(''));
+
+  grid.innerHTML=c1+c2+c3+c4+c5+c6;
+}
+
+// ── Rebuild false-flags sections from live ff-row state ────────────────────
+function refreshFalseFlags(){
+  const sections=document.getElementById('ff-sections');
+  const byDevGrid=document.getElementById('ff-by-dev-grid');
+  if(!sections||!byDevGrid) return;
+
+  // Collect live false-flag rows from developer cards
+  const ffByCat={}, ffByDev={};
+  document.querySelectorAll('#tab-developers tr[data-key].ff-row').forEach(row=>{
+    if(row.style.display==='none') return;
+    const key=row.dataset.key||'';
+    const dev=row.dataset.dev||row.closest('.dev-card')?.querySelector('.dev-info h3')?.textContent?.trim()||'';
+    const catEl=row.cells[11]?.querySelector('.badge');
+    const cat=catEl?.textContent?.trim()||'Manual';
+    const prio=(row.cells[4]?.textContent||'').trim();
+    const type=(row.cells[3]?.textContent||'').trim();
+    const summary=row.cells[2]?.dataset?.full||row.cells[2]?.textContent?.trim()||'';
+    const entry={key,dev,cat,prio,type,summary};
+    (ffByCat[cat]||(ffByCat[cat]=[])).push(entry);
+    (ffByDev[dev] ||(ffByDev[dev] =[])).push(entry);
+  });
+
+  // Cache original ff-item nodes by key (they hold the evidence text)
+  const existingItems={};
+  sections.querySelectorAll('.ff-item[data-ff-key]').forEach(el=>{
+    existingItems[el.dataset.ffKey]=el;
+  });
+
+  // Rebuild category blocks, reusing preserved item nodes for evidence text
+  const catIcon={'Cannot Reproduce':'🔍','Tester Procedure Issue':'📋','API Already Correct':'🔧','Environment / Config Issue':'⚙️'};
+  const allCats=[...new Set(['Tester Procedure Issue','Working as Designed / Expected','Cannot Reproduce','API Already Correct','Environment / Config Issue','Manual',...Object.keys(ffByCat)])].filter(c=>ffByCat[c]);
+  const prioBg={Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
+  const typeBg={'API / Backend':'#6366f1','UI / Frontend':'#ec4899',Security:'#dc2626',Validation:'#f59e0b','Data / CRUD':'#0891b2',Functional:'#94a3b8'};
+
+  sections.innerHTML=allCats.map(cat=>{
+    const items=ffByCat[cat]||[];
+    const itemsHtml=items.map(({key,dev,prio,type,summary})=>{
+      if(existingItems[key]){
+        // Reuse original node — update dev name if reassigned
+        const orig=existingItems[key];
+        const devEl=orig.querySelector('strong');
+        if(devEl) devEl.textContent=dev;
+        return orig.outerHTML;
+      }
+      // Fallback for manually-added false flags with no original node
+      return `<div class="ff-item" data-ff-key="${key}">
+        <a href="https://brightlysoftware.atlassian.net/browse/${key}" target="_blank" class="jira-link">${key}</a>
+        <span class="badge" style="background:${prioBg[prio]||'#64748b'}">${prio}</span>
+        <span class="badge" style="background:${typeBg[type]||'#94a3b8'}">${type}</span>
+        <strong style="margin-left:8px">${dev}</strong>
+        <span style="color:var(--text2);margin-left:8px;font-size:12px">${summary.substring(0,80)}${summary.length>80?'…':''}</span>
+      </div>`;
+    }).join('');
+    return `<div class="ff-category-card" data-ff-cat="${cat}">
+      <h3>${catIcon[cat]||'✅'} ${cat} — ${items.length}</h3>
+      ${itemsHtml}
+    </div>`;
+  }).join('');
+
+  // Rebuild by-developer grid
+  byDevGrid.innerHTML=Object.entries(ffByDev).sort((a,b)=>b[1].length-a[1].length).map(([dev,ffs])=>`
+    <div class="lb-card" style="border-color:var(--purple)">
+      <h3 style="color:var(--purple)">${dev} — ${ffs.length}</h3>
+      <table><tbody>${ffs.map(f=>`
+        <tr>
+          <td><a href="https://brightlysoftware.atlassian.net/browse/${f.key}" target="_blank" class="jira-link">${f.key}</a></td>
+          <td><span class="badge" style="background:${prioBg[f.prio]||'#64748b'}">${f.prio}</span></td>
+          <td style="font-size:11px;color:var(--text2)">${f.cat}</td>
+        </tr>`).join('')}
+      </tbody></table>
+    </div>`).join('');
+
+  // Update section title count
+  const titleEl=document.querySelector('#tab-falseflags h2.section-title');
+  const total=Object.values(ffByCat).reduce((s,a)=>s+a.length,0);
+  if(titleEl) titleEl.textContent=`⚑ False Flag Defects — ${total} Identified`;
 }
 
 // ── row numbering ──────────────────────────────────────────────────────────
