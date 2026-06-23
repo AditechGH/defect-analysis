@@ -114,10 +114,15 @@ for (const ff of falseFlags) {
 }
 
 // ── Issue table rows ─────────────────────────────────────────────────────
-function issueRows(issues) {
+// Every row gets: data-key, data-orig-dev (populated by JS at runtime),
+// a leading # cell, and a trailing Edit button cell.
+// Column order: # | Key | Summary | Type | Priority | Status | Reporter | →RFT | →Close | Bounces | Cmts | FalseFlag | Edit
+function issueRows(issues, devName) {
   return issues.map((i, idx) => {
     const isFF = i.isFalseFlag;
-    return `<tr class="${idx%2===0?'row-even':'row-odd'}${isFF?' ff-row':''}">
+    const safeDevName = (devName||'').replace(/"/g, '&quot;');
+    return `<tr data-key="${i.key}" data-orig-dev="${safeDevName}" class="${idx%2===0?'row-even':'row-odd'}${isFF?' ff-row':''}">
+      <td class="num-col row-num">—</td>
       <td><a href="https://brightlysoftware.atlassian.net/browse/${i.key}" target="_blank" class="jira-link">${i.key}</a>${isFF?` ${ffBadge()}`:''}
       </td>
       <td class="summary-cell" title="${(i.summary||'').replace(/"/g,'&quot;').replace(/[<>]/g,'')}">${(i.summary||'').substring(0,75)}${(i.summary||'').length>75?'…':''}</td>
@@ -130,6 +135,7 @@ function issueRows(issues) {
       <td class="${i.bounces>=3?'bounce-high':i.bounces>=1?'bounce-mid':'bounce-low'}">${i.bounces}</td>
       <td>${i.commentCount}</td>
       ${isFF?`<td class="ff-reason-cell" title="${(i.falseFlagReason||'').replace(/[<>"]/g,' ')}">${i.falseFlagCategory||'—'}</td>`:'<td>—</td>'}
+      <td class="actions-col"><button class="act-btn" onclick="openEdit(this)">✏️</button></td>
     </tr>`;
   }).join('');
 }
@@ -140,7 +146,7 @@ function devCard(ds, idx) {
   const acs = ['#6366f1','#ec4899','#0891b2','#16a34a','#d97706','#7c3aed','#ea580c','#059669','#2563eb','#64748b'];
   const ac  = acs[idx % acs.length];
   return `
-  <div class="dev-card" id="dev-${idx}">
+  <div class="dev-card" id="dev-${idx}" data-dev="${ds.name}">
     <div class="dev-header" onclick="toggleDev(${idx})">
       <div class="dev-avatar" style="background:${ac}">${initials}</div>
       <div class="dev-info">
@@ -178,11 +184,11 @@ function devCard(ds, idx) {
       <div class="table-wrapper">
         <table class="issue-table">
           <thead><tr>
-            <th>Key</th><th>Summary</th><th>Type</th><th>Priority</th>
+            <th class="num-col">#</th><th>Key</th><th>Summary</th><th>Type</th><th>Priority</th>
             <th>Status</th><th>Reporter</th><th>→RFT (d)</th><th>→Close (d)</th>
-            <th>Bounces</th><th>Cmts</th><th>False Flag</th>
+            <th>Bounces</th><th>Cmts</th><th>False Flag</th><th class="actions-col"></th>
           </tr></thead>
-          <tbody>${issueRows(ds.issues)}</tbody>
+          <tbody>${issueRows(ds.issues, ds.name)}</tbody>
         </table>
       </div>
     </div>
@@ -191,12 +197,51 @@ function devCard(ds, idx) {
 
 const generatedAt = new Date().toLocaleString('en-GB',{dateStyle:'long',timeStyle:'short'});
 
+// ── Build CNF_RAW blob — embedded so the page can recompute stats live ───────
+// Shape: { [devId]: { name, email, issues: [{key,summary,defectType,priority,status,
+//   isFalseFlag,bounces,timeToRftDays,timeToCloseDays,commentCount,reporterName}] } }
+const cnfRawDevs = {};
+for (const [devId, d] of Object.entries(devData)) {
+  cnfRawDevs[devId] = {
+    name:  d.name,
+    email: d.email,
+    issues: d.issues.map(i => ({
+      key:             i.key,
+      summary:         i.summary,
+      defectType:      i.defectType,
+      priority:        i.priority,
+      status:          i.status,
+      isFalseFlag:     i.isFalseFlag,
+      bounces:         i.bounces,
+      timeToRftDays:   i.timeToRftDays,
+      timeToCloseDays: i.timeToCloseDays,
+      commentCount:    i.commentCount,
+      reporterName:    i.reporterName || '',
+    })),
+  };
+}
+const cnfRawJSON = JSON.stringify(cnfRawDevs);
+
+// ── Build CNF_FF_RAW blob — original false-flag records with reason/category ─
+// Used by the live False Flags tab renderer.
+const cnfFfRaw = falseFlags.map(ff => ({
+  key:               ff.key,
+  summary:           ff.summary,
+  defectType:        ff.defectType,
+  priority:          ff.priority,
+  category:          ff.category,
+  reason:            ff.reason,
+  assignedDeveloper: ff.assignedDeveloper,
+}));
+const cnfFfRawJSON = JSON.stringify(cnfFfRaw);
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Sprint Defect Analysis Dashboard — CNF v2</title>
+<script>window.CNF_RAW=${cnfRawJSON};window.CNF_FF_RAW=${cnfFfRawJSON};</script>
 <style>
 :root { --bg:#0f172a;--surface:#1e293b;--surface2:#273548;--border:#334155;--text:#e2e8f0;--text2:#94a3b8;--accent:#6366f1;--green:#22c55e;--red:#ef4444;--orange:#f97316;--purple:#a78bfa; }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -286,15 +331,15 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 </header>
 
 <div class="kpi-grid">
-  <div class="kpi-card"><div class="kpi-num">${totalIssues}</div><div class="kpi-lbl">Total Issues</div></div>
-  <div class="kpi-card"><div class="kpi-num">${totalRealIssues}</div><div class="kpi-lbl">Real Defects</div></div>
-  <div class="kpi-card ff-card"><div class="kpi-num purple">${totalFFIssues}</div><div class="kpi-lbl">False Flags</div></div>
-  <div class="kpi-card"><div class="kpi-num">10</div><div class="kpi-lbl">Developers</div></div>
-  <div class="kpi-card"><div class="kpi-num">${allRealIssues.length>0?(overallBounce/allRealIssues.length).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Bounces/Issue</div></div>
-  <div class="kpi-card"><div class="kpi-num">${overallRft.length>0?avg(overallRft).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Days → RFT</div></div>
-  <div class="kpi-card"><div class="kpi-num">${overallClose.length>0?avg(overallClose).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Days → Close</div></div>
-  <div class="kpi-card"><div class="kpi-num">${overallByStatus['Development Complete']||0}</div><div class="kpi-lbl">Dev Complete</div></div>
-  <div class="kpi-card"><div class="kpi-num">${(overallByStatus['Ready for Testing']||0)+(overallByStatus['In Testing']||0)}</div><div class="kpi-lbl">In Testing</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-total">${totalIssues}</div><div class="kpi-lbl">Total Issues</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-real">${totalRealIssues}</div><div class="kpi-lbl">Real Defects</div></div>
+  <div class="kpi-card ff-card"><div class="kpi-num purple" id="kpi-ff">${totalFFIssues}</div><div class="kpi-lbl">False Flags</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-devs">10</div><div class="kpi-lbl">Developers</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-avg-bounces">${allRealIssues.length>0?(overallBounce/allRealIssues.length).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Bounces/Issue</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-avg-rft">${overallRft.length>0?avg(overallRft).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Days → RFT</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-avg-close">${overallClose.length>0?avg(overallClose).toFixed(1):'—'}</div><div class="kpi-lbl">Avg Days → Close</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-dev-complete">${overallByStatus['Development Complete']||0}</div><div class="kpi-lbl">Dev Complete</div></div>
+  <div class="kpi-card"><div class="kpi-num" id="kpi-in-testing">${(overallByStatus['Ready for Testing']||0)+(overallByStatus['In Testing']||0)}</div><div class="kpi-lbl">In Testing</div></div>
 </div>
 
 <div class="tab-bar">
@@ -321,7 +366,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <th>Top Defect Type</th><th>Avg Bounces</th><th>Max Bounces</th>
         <th>Avg→RFT (d)</th><th>Avg→Close (d)</th><th>Blockers</th><th>Urgent</th>
       </tr></thead>
-      <tbody>${devSummaries.sort((a,b)=>b.realCount-a.realCount).map((d,idx)=>{
+      <tbody id="dev-summary-tbody">${devSummaries.sort((a,b)=>b.realCount-a.realCount).map((d,idx)=>{
         const topType = Object.entries(d.byType).sort((a,b)=>b[1]-a[1])[0];
         const blockers = d.byPrio['Blocker']||0, urgents = d.byPrio['Urgent']||0;
         return `<tr class="${idx%2===0?'row-even':'row-odd'}">
@@ -352,27 +397,27 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 <!-- ── Leaderboard ── -->
 <div class="tab-panel" id="tab-leaderboard">
   <h2 class="section-title">Performance Leaderboards (Real Defects Only)</h2>
-  <div class="lb-grid">
-    <div class="lb-card">
+  <div class="lb-grid" id="lb-grid">
+    <div class="lb-card" id="lb-most-defects">
       <h3>🔢 Most Real Defects Assigned</h3>
-      <table><tbody>
+      <table><tbody id="lb-most-defects-body">
         ${[...devSummaries].sort((a,b)=>b.realCount-a.realCount).map((d,i)=>`
         <tr><td><span class="rank" style="background:${['#f59e0b','#94a3b8','#b45309','#64748b','#64748b'][Math.min(i,4)]}">${i+1}</span></td>
         <td>${d.name}</td><td><strong>${d.realCount}</strong></td></tr>`).join('')}
       </tbody></table>
     </div>
-    <div class="lb-card">
+    <div class="lb-card" id="lb-avg-bounces">
       <h3>⚡ Avg Bounces (lower = better)</h3>
-      <table><tbody>
+      <table><tbody id="lb-avg-bounces-body">
         ${[...devSummaries].sort((a,b)=>a.avgBounces-b.avgBounces).map((d,i)=>`
         <tr><td><span class="rank" style="background:${i===0?'#16a34a':i===1?'#22c55e':'#64748b'}">${i+1}</span></td>
         <td>${d.name}</td>
         <td class="${d.avgBounces>=3?'bounce-high':d.avgBounces>=1.5?'bounce-mid':''}"><strong>${fmt(d.avgBounces)}</strong></td></tr>`).join('')}
       </tbody></table>
     </div>
-    <div class="lb-card">
+    <div class="lb-card" id="lb-fastest-rft">
       <h3>⏱ Fastest to Ready for Testing</h3>
-      <table><tbody>
+      <table><tbody id="lb-fastest-rft-body">
         ${[...devSummaries].filter(d=>d.avgRftDays!==null).sort((a,b)=>a.avgRftDays-b.avgRftDays).map((d,i)=>`
         <tr><td><span class="rank" style="background:${i===0?'#16a34a':i===1?'#22c55e':'#64748b'}">${i+1}</span></td>
         <td>${d.name}</td><td><strong>${fmt(d.avgRftDays)} d</strong></td></tr>`).join('')}
@@ -380,26 +425,26 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <tr><td><span class="rank" style="background:#475569">—</span></td><td>${d.name}</td><td style="color:var(--text2)">No data</td></tr>`).join('')}
       </tbody></table>
     </div>
-    <div class="lb-card">
+    <div class="lb-card" id="lb-fastest-close">
       <h3>✅ Fastest to Close (avg)</h3>
-      <table><tbody>
+      <table><tbody id="lb-fastest-close-body">
         ${[...devSummaries].filter(d=>d.avgCloseDays!==null).sort((a,b)=>a.avgCloseDays-b.avgCloseDays).map((d,i)=>`
         <tr><td><span class="rank" style="background:${i===0?'#16a34a':i===1?'#22c55e':'#64748b'}">${i+1}</span></td>
         <td>${d.name}</td><td><strong>${fmt(d.avgCloseDays)} d</strong></td></tr>`).join('')}
       </tbody></table>
     </div>
-    <div class="lb-card">
+    <div class="lb-card" id="lb-most-blockers">
       <h3>🚨 Most Blockers (real)</h3>
-      <table><tbody>
+      <table><tbody id="lb-most-blockers-body">
         ${[...devSummaries].sort((a,b)=>(b.byPrio['Blocker']||0)-(a.byPrio['Blocker']||0)).map((d,i)=>`
         <tr><td><span class="rank" style="background:${(d.byPrio['Blocker']||0)>3?'#dc2626':'#64748b'}">${i+1}</span></td>
         <td>${d.name}</td>
         <td class="${(d.byPrio['Blocker']||0)>3?'bounce-high':''}"><strong>${d.byPrio['Blocker']||0}</strong></td></tr>`).join('')}
       </tbody></table>
     </div>
-    <div class="lb-card">
+    <div class="lb-card" id="lb-max-bounces">
       <h3>🔴 Max Single-Issue Bounces</h3>
-      <table><tbody>
+      <table><tbody id="lb-max-bounces-body">
         ${[...devSummaries].sort((a,b)=>b.maxBounce-a.maxBounce).map((d,i)=>`
         <tr><td><span class="rank" style="background:${d.maxBounce>=8?'#dc2626':d.maxBounce>=5?'#ea580c':'#64748b'}">${i+1}</span></td>
         <td>${d.name}${d.highBounce?` <span style="color:var(--text2);font-size:11px">(${d.highBounce.key})</span>`:''}</td>
@@ -411,78 +456,26 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <h2 class="section-title">All High-Bounce Issues (≥ 4 bounces, real defects only)</h2>
   <div class="table-wrapper">
     <table class="issue-table">
-      <thead><tr><th>Key</th><th>Developer</th><th>Summary</th><th>Type</th><th>Priority</th><th>Status</th><th>Bounces</th><th>Comments</th></tr></thead>
-      <tbody>
+      <thead><tr><th class="num-col">#</th><th>Key</th><th>Developer</th><th>Summary</th><th>Type</th><th>Priority</th><th>Status</th><th>Bounces</th><th>Comments</th><th class="actions-col"></th></tr></thead>
+      <tbody id="lb-highbounce-body">
         ${allRealIssues.filter(i=>i.bounces>=4).sort((a,b)=>b.bounces-a.bounces).map((i,idx)=>`
-        <tr class="${idx%2===0?'row-even':'row-odd'}">
+        <tr data-key="${i.key}" data-orig-dev="${(i.devName||'').replace(/"/g,'&quot;')}" class="${idx%2===0?'row-even':'row-odd'}">
+          <td class="num-col row-num">—</td>
           <td><a href="https://brightlysoftware.atlassian.net/browse/${i.key}" target="_blank" class="jira-link">${i.key}</a></td>
           <td>${i.devName}</td>
           <td class="summary-cell" title="${i.summary}">${i.summary.substring(0,75)}${i.summary.length>75?'…':''}</td>
           <td>${typeBadge(i.defectType)}</td><td>${priorityBadge(i.priority)}</td><td>${statusBadge(i.status)}</td>
           <td class="bounce-high">${i.bounces}</td><td>${i.commentCount}</td>
+          <td class="actions-col"><button class="act-btn" onclick="openEdit(this)">✏️</button></td>
         </tr>`).join('')}
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- ── False Flags Tab ── -->
+<!-- ── False Flags Tab — fully live-rendered by JS ── -->
 <div class="tab-panel" id="tab-falseflags">
-  <h2 class="section-title">⚑ False Flag Defects — ${totalFFIssues} Identified</h2>
-  <p style="color:var(--text2);margin-bottom:20px;font-size:13px">
-    A false flag is a defect raised by a tester that was determined to be <strong>not a real code bug</strong>:
-    either the behaviour was already correct/by design, the issue could not be reproduced (environment-specific),
-    or the tester was following incorrect procedure. These are distinct from defects that were fixed —
-    those were excluded even if the tester later confirmed "working as expected" after receiving a fix build.
-  </p>
-
-  ${Object.entries(ffByCategory).map(([cat, items]) => `
-  <div class="ff-category-card">
-    <h3>${cat === 'Cannot Reproduce' ? '🔍' : cat === 'Tester Procedure Issue' ? '📋' : '✅'} ${cat} — ${items.length} issue(s)</h3>
-    ${items.map(ff => `
-    <div class="ff-item">
-      <span class="ff-key"><a href="https://brightlysoftware.atlassian.net/browse/${ff.key}" target="_blank" class="jira-link">${ff.key}</a></span>
-      ${priorityBadge(ff.priority)} ${typeBadge(ff.defectType)}
-      <strong style="margin-left:8px">${ff.assignedDeveloper}</strong>
-      <span style="color:var(--text2);margin-left:8px;font-size:12px">${ff.summary.substring(0,80)}${ff.summary.length>80?'…':''}</span>
-      <div class="ff-evidence">"${ff.reason.substring(0,180)}${ff.reason.length>180?'…':''}"</div>
-    </div>`).join('')}
-  </div>`).join('')}
-
-  <h2 class="section-title" style="margin-top:32px">False Flags by Developer</h2>
-  <div class="lb-grid">
-    ${Object.entries(ffByDev).sort((a,b)=>b[1].length-a[1].length).map(([dev,ffs])=>`
-    <div class="lb-card" style="border-color:var(--purple)">
-      <h3 style="color:var(--purple)">${dev} — ${ffs.length} false flag(s)</h3>
-      <table><tbody>
-        ${ffs.map(ff=>`
-        <tr>
-          <td><a href="https://brightlysoftware.atlassian.net/browse/${ff.key}" target="_blank" class="jira-link">${ff.key}</a></td>
-          <td>${priorityBadge(ff.priority)}</td>
-          <td style="font-size:11px;color:var(--text2)">${ff.category}</td>
-        </tr>`).join('')}
-      </tbody></table>
-    </div>`).join('')}
-  </div>
-
-  <h2 class="section-title">All False Flag Issues</h2>
-  <div class="table-wrapper">
-    <table class="issue-table">
-      <thead><tr><th>Key</th><th>Developer</th><th>Summary</th><th>Type</th><th>Priority</th><th>Category</th><th>Evidence</th></tr></thead>
-      <tbody>
-        ${falseFlags.map((ff,idx)=>`
-        <tr class="${idx%2===0?'row-even':'row-odd'} ff-row">
-          <td><a href="https://brightlysoftware.atlassian.net/browse/${ff.key}" target="_blank" class="jira-link">${ff.key}</a></td>
-          <td>${ff.assignedDeveloper}</td>
-          <td class="summary-cell" title="${ff.summary}">${ff.summary.substring(0,70)}${ff.summary.length>70?'…':''}</td>
-          <td>${typeBadge(ff.defectType)}</td>
-          <td>${priorityBadge(ff.priority)}</td>
-          <td><span class="badge" style="background:#7c3aed">${ff.category}</span></td>
-          <td style="font-size:11px;color:var(--text2);max-width:300px" title="${ff.reason.replace(/[<>"]/g,' ')}">${ff.reason.substring(0,100)}${ff.reason.length>100?'…':''}</td>
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
+  <div id="ff-tab-content"><!-- populated by refreshFalseFlags() on load and after every edit --></div>
 </div>
 
 <footer>Generated by Claude Code · CNF Sprint Defect Analysis · ${generatedAt} · Data from Jira (brightlysoftware.atlassian.net)</footer>
