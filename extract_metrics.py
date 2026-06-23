@@ -7,7 +7,8 @@ import os
 import re
 from datetime import datetime, timezone
 
-BASE = r"C:\Users\z00597ew\.claude\projects\C--optimus-prime-mission-defect-analysis\b593024f-81b5-4d1b-9525-4f972940486d\tool-results"
+# Path to tool results directory (set via BASE_PATH env var or default to ./tool-results)
+BASE = os.environ.get('BASE_PATH', os.path.join(os.path.dirname(__file__), 'tool-results'))
 
 # Developer account ID -> name + email mapping
 DEVELOPERS = {
@@ -162,7 +163,7 @@ for i, fname in enumerate(files):
     }
 
 # Save to JSON for dashboard generation
-out_path = r"C:\optimus-prime\mission\defect-analysis\dev_metrics.json"
+out_path = os.path.join(os.path.dirname(__file__), 'dev_metrics.json')
 with open(out_path, 'w', encoding='utf-8') as f:
     json.dump(dev_data, f, indent=2, default=str)
 

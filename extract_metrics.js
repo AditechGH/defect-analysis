@@ -1,7 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const BASE = String.raw`C:\Users\z00597ew\.claude\projects\C--optimus-prime-mission-defect-analysis\b593024f-81b5-4d1b-9525-4f972940486d\tool-results`;
+// Path to tool results directory (set via BASE_PATH env var or default to ./tool-results)
+const BASE = process.env.BASE_PATH || path.join(__dirname, "tool-results");
 
 const DEVELOPERS = {
   "712020:d9aa0306-1300-44fc-bd29-8abe306f07fe": {
