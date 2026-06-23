@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__atlassian__getAccessibleAtlassianResources",
+      "mcp__atlassian__lookupJiraAccountId",
+      "mcp__atlassian__searchJiraIssuesUsingJql",
+      "PowerShell(Get-Command *)",
+      "mcp__atlassian__getJiraIssue",
+      "PowerShell(\\(Get-Content \"C:\\\\optimus-prime\\\\mission\\\\defect-analysis\\\\defect_dashboard.html\" -Raw\\).Length)",
+      "PowerShell(gh auth *)",
+      "PowerShell(Test-NetConnection *)",
+      "PowerShell(Get-Content *)"
+    ]
+  }
+}
