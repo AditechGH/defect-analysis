@@ -6,11 +6,52 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 const { WebSocketServer } = require('ws');
+
+function loadDotEnv(envPath) {
+  try {
+    const content = fs.readFileSync(envPath, 'utf8');
+    for (const rawLine of content.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+      const eqIdx = line.indexOf('=');
+      if (eqIdx <= 0) continue;
+      const key = line.slice(0, eqIdx).trim();
+      const value = line.slice(eqIdx + 1).trim();
+      if (process.env[key] === undefined) process.env[key] = value;
+    }
+  } catch {
+    // .env is optional.
+  }
+}
+
+loadDotEnv(path.join(__dirname, '.env'));
 
 const PORT = process.env.PORT || 3000;
 const HTML_FILE = path.join(__dirname, 'defect_dashboard.html');
 const STORE_FILE = path.join(__dirname, 'edits.json');
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
+const JSONBIN_ID_FILE = path.join(__dirname, '.jsonbin-bin-id');
+const JSONBIN_ACCESS_KEY =
+  process.env.JSONBIN_ACCESS_KEY ||
+  process.env['X-ACCESS-KEY'] ||
+  process.env['X_ACCESS_KEY'] ||
+  '';
+const JSONBIN_COLLECTION_ID = process.env.JSONBIN_COLLECTION_ID || '';
+
+let jsonBinId =
+  process.env.JSONBIN_BIN_ID ||
+  process.env.JSONBIN_BINID ||
+  '';
+
+if (!jsonBinId) {
+  try {
+    jsonBinId = fs.readFileSync(JSONBIN_ID_FILE, 'utf8').trim();
+  } catch {
+    jsonBinId = '';
+  }
+}
 
 // ── Persistent edit store ─────────────────────────────────────────────────
 function loadStore() {
@@ -22,6 +63,83 @@ function saveStore(store) {
 }
 let editStore = loadStore();
 console.log(`Loaded ${Object.keys(editStore).length} existing edits from edits.json`);
+
+function writeJsonBinId(id) {
+  try { fs.writeFileSync(JSONBIN_ID_FILE, String(id || '').trim(), 'utf8'); }
+  catch { /* non-fatal */ }
+}
+
+function jsonBinRequest(method, endpointPath, payload = null) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(endpointPath, JSONBIN_BASE);
+    const body = payload === null ? null : JSON.stringify(payload);
+
+    const req = https.request(
+      url,
+      {
+        method,
+        headers: {
+          'X-Access-Key': JSONBIN_ACCESS_KEY,
+          'Content-Type': 'application/json',
+          ...(body ? { 'Content-Length': Buffer.byteLength(body) } : {}),
+        },
+      },
+      (res) => {
+        let raw = '';
+        res.on('data', (chunk) => { raw += chunk; });
+        res.on('end', () => {
+          let parsed = null;
+          try { parsed = raw ? JSON.parse(raw) : null; }
+          catch { parsed = raw; }
+
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(parsed);
+            return;
+          }
+          const msg =
+            (parsed && parsed.message) ||
+            `JSONBin request failed (${res.statusCode})`;
+          reject(new Error(msg));
+        });
+      }
+    );
+
+    req.on('error', reject);
+    if (body) req.write(body);
+    req.end();
+  });
+}
+
+async function ensureJsonBinReady() {
+  if (!JSONBIN_ACCESS_KEY) return false;
+
+  if (!jsonBinId) {
+    const createPath = JSONBIN_COLLECTION_ID
+      ? `/b?collectionId=${encodeURIComponent(JSONBIN_COLLECTION_ID)}`
+      : '/b';
+    const created = await jsonBinRequest('POST', createPath, editStore);
+    jsonBinId = created?.metadata?.id || created?.record?.id || '';
+    if (!jsonBinId) throw new Error('JSONBin create succeeded but no bin id returned');
+    writeJsonBinId(jsonBinId);
+    console.log('Created JSONBin for edits persistence.');
+    return true;
+  }
+
+  const remote = await jsonBinRequest('GET', `/b/${encodeURIComponent(jsonBinId)}/latest`);
+  if (remote && typeof remote.record === 'object' && remote.record !== null) {
+    editStore = remote.record;
+    saveStore(editStore);
+    console.log(`Loaded ${Object.keys(editStore).length} edits from JSONBin.`);
+  }
+  return true;
+}
+
+async function persistStore() {
+  if (JSONBIN_ACCESS_KEY && jsonBinId) {
+    await jsonBinRequest('PUT', `/b/${encodeURIComponent(jsonBinId)}`, editStore);
+  }
+  saveStore(editStore);
+}
 
 function sendJson(res, code, payload) {
   res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -65,12 +183,13 @@ const httpServer = http.createServer(async (req, res) => {
     try {
       const data = await readJsonBody(req);
       editStore[key] = data;
-      saveStore(editStore);
+      await persistStore();
       console.log(`Edit saved via API: ${key} (${data.assignee || '—'} | FF:${data.isFalseFlag})`);
       broadcastEdit(key, data);
       return sendJson(res, 200, { ok: true });
     } catch (err) {
-      return sendJson(res, 400, { error: 'Invalid JSON payload' });
+      const msg = err && err.message ? err.message : 'Invalid JSON payload';
+      return sendJson(res, 400, { error: msg });
     }
   }
 
@@ -181,7 +300,7 @@ wss.on('connection', (ws) => {
   clients.add(ws);
   console.log(`Client connected  (${clients.size} total)`);
 
-  ws.on('message', (raw) => {
+  ws.on('message', async (raw) => {
     let msg;
     try { msg = JSON.parse(raw); } catch { return; }
 
@@ -194,9 +313,13 @@ wss.on('connection', (ws) => {
     if (msg.type === 'edit' && msg.key && msg.data) {
       // Persist
       editStore[msg.key] = msg.data;
-      saveStore(editStore);
-      console.log(`Edit saved: ${msg.key} (${msg.data.assignee || '—'} | FF:${msg.data.isFalseFlag})`);
-      broadcastEdit(msg.key, msg.data, ws);
+      try {
+        await persistStore();
+        console.log(`Edit saved: ${msg.key} (${msg.data.assignee || '—'} | FF:${msg.data.isFalseFlag})`);
+        broadcastEdit(msg.key, msg.data, ws);
+      } catch (err) {
+        console.error('Failed to persist websocket edit:', err.message || err);
+      }
     }
   });
 
@@ -207,14 +330,32 @@ wss.on('connection', (ws) => {
 });
 
 // ── Start ──────────────────────────────────────────────────────────────────
-httpServer.listen(PORT, () => {
-  console.log('');
-  console.log('╔════════════════════════════════════════╗');
-  console.log(`║  CNF Defect Dashboard                  ║`);
-  console.log(`║  http://localhost:${PORT}                  ║`);
-  console.log('╚════════════════════════════════════════╝');
-  console.log('');
-  console.log('Run this in a second terminal to get a public URL:');
-  console.log(`  npx localtunnel --port ${PORT}`);
-  console.log('');
+async function startServer() {
+  if (JSONBIN_ACCESS_KEY) {
+    try {
+      await ensureJsonBinReady();
+      console.log('JSONBin persistence is enabled.');
+    } catch (err) {
+      console.error('JSONBin initialization failed, falling back to local edits.json:', err.message || err);
+    }
+  } else {
+    console.log('JSONBin key not found in .env; using local edits.json persistence.');
+  }
+
+  httpServer.listen(PORT, () => {
+    console.log('');
+    console.log('╔════════════════════════════════════════╗');
+    console.log(`║  CNF Defect Dashboard                  ║`);
+    console.log(`║  http://localhost:${PORT}                  ║`);
+    console.log('╚════════════════════════════════════════╝');
+    console.log('');
+    console.log('Run this in a second terminal to get a public URL:');
+    console.log(`  npx localtunnel --port ${PORT}`);
+    console.log('');
+  });
+}
+
+startServer().catch((err) => {
+  console.error('Fatal startup error:', err.message || err);
+  process.exitCode = 1;
 });
