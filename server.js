@@ -3,14 +3,14 @@
  * Serves the dashboard HTML and syncs edits across all connected clients via WebSocket.
  * Edit state is persisted to edits.json so changes survive server restarts.
  */
-const http  = require('http');
-const fs    = require('fs');
-const path  = require('path');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const { WebSocketServer } = require('ws');
 
-const PORT      = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const HTML_FILE = path.join(__dirname, 'defect_dashboard.html');
-const STORE_FILE= path.join(__dirname, 'edits.json');
+const STORE_FILE = path.join(__dirname, 'edits.json');
 
 // ── Persistent edit store ─────────────────────────────────────────────────
 function loadStore() {
@@ -23,9 +23,58 @@ function saveStore(store) {
 let editStore = loadStore();
 console.log(`Loaded ${Object.keys(editStore).length} existing edits from edits.json`);
 
+function sendJson(res, code, payload) {
+  res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(payload));
+}
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 1e6) {
+        reject(new Error('Request body too large'));
+        req.destroy();
+      }
+    });
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 // ── HTTP server — serves only the dashboard ───────────────────────────────
-const httpServer = http.createServer((req, res) => {
-  if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
+const httpServer = http.createServer(async (req, res) => {
+  const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const pathname = reqUrl.pathname;
+
+  if (req.method === 'GET' && pathname === '/api/edits') {
+    return sendJson(res, 200, editStore);
+  }
+
+  if (req.method === 'PUT' && pathname.startsWith('/api/edits/')) {
+    const key = decodeURIComponent(pathname.substring('/api/edits/'.length));
+    if (!key) return sendJson(res, 400, { error: 'Missing edit key' });
+
+    try {
+      const data = await readJsonBody(req);
+      editStore[key] = data;
+      saveStore(editStore);
+      console.log(`Edit saved via API: ${key} (${data.assignee || '—'} | FF:${data.isFalseFlag})`);
+      broadcastEdit(key, data);
+      return sendJson(res, 200, { ok: true });
+    } catch (err) {
+      return sendJson(res, 400, { error: 'Invalid JSON payload' });
+    }
+  }
+
+  if (req.method === 'GET' && (pathname === '/' || pathname === '/index.html')) {
     fs.readFile(HTML_FILE, 'utf8', (err, data) => {
       if (err) { res.writeHead(500); return res.end('Dashboard file not found'); }
       // Inject the WebSocket client script just before </body>
@@ -66,12 +115,6 @@ const httpServer = http.createServer((req, res) => {
         if(typeof refreshAllStats === 'function') refreshAllStats();
         showSyncStatus('🔄 Updated');
         setTimeout(()=>showSyncStatus('🟢 Live'), 1500);
-        // Mirror into localStorage so offline behaviour still works
-        try {
-          const ovr = JSON.parse(localStorage.getItem('cnf-overrides')||'{}');
-          ovr[msg.key] = msg.data;
-          localStorage.setItem('cnf-overrides', JSON.stringify(ovr));
-        } catch(e){}
         return;
       }
     };
@@ -114,15 +157,25 @@ const httpServer = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(injected);
     });
-  } else {
-    res.writeHead(404);
-    res.end('Not found');
+    return;
   }
+
+  res.writeHead(404);
+  res.end('Not found');
 });
 
 // ── WebSocket server ───────────────────────────────────────────────────────
 const wss = new WebSocketServer({ server: httpServer });
 const clients = new Set();
+
+function broadcastEdit(key, data, excludeClient = null) {
+  const payload = JSON.stringify({ type: 'edit', key, data });
+  for (const client of clients) {
+    if (client !== excludeClient && client.readyState === 1 /* OPEN */) {
+      client.send(payload);
+    }
+  }
+}
 
 wss.on('connection', (ws) => {
   clients.add(ws);
@@ -143,14 +196,7 @@ wss.on('connection', (ws) => {
       editStore[msg.key] = msg.data;
       saveStore(editStore);
       console.log(`Edit saved: ${msg.key} (${msg.data.assignee || '—'} | FF:${msg.data.isFalseFlag})`);
-
-      // Broadcast to every OTHER client
-      const payload = JSON.stringify({ type: 'edit', key: msg.key, data: msg.data });
-      for (const client of clients) {
-        if (client !== ws && client.readyState === 1 /* OPEN */) {
-          client.send(payload);
-        }
-      }
+      broadcastEdit(msg.key, msg.data, ws);
     }
   });
 

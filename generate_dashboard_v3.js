@@ -6,7 +6,7 @@
  *   3. Flag/unflag defect as false flag (via Edit modal)
  *   4. Edit summary, priority, type on the dashboard
  *   5. Light/dark theme toggle
- * All edits stored in localStorage — no server needed.
+ * All edits persisted to edits.json via server APIs.
  */
 const fs = require('fs');
 const path = require('path');
@@ -701,16 +701,48 @@ function toggleTheme(){
   applyTheme(nxt);
 }
 
-// ── localStorage overrides ─────────────────────────────────────────────────
+// ── server-backed overrides (edits.json) ───────────────────────────────────
 // Shape: { [cnfKey]: { summary, assignee, priority, defectType, isFalseFlag, ffCat, ffNotes, changeReason, _ts } }
-function getOverrides(){ return JSON.parse(localStorage.getItem('cnf-overrides')||'{}'); }
-function putOverrides(o){ localStorage.setItem('cnf-overrides',JSON.stringify(o)); }
+let _overrideStore = {};
+
+function getOverrides(){ return _overrideStore; }
+
+async function loadOverrides(){
+  try {
+    const res = await fetch('/api/edits', { cache: 'no-store' });
+    if(!res.ok) throw new Error('Failed to load edits.json store');
+    _overrideStore = await res.json();
+  } catch (e) {
+    console.warn('Could not load edits from server, using empty store.', e);
+    _overrideStore = {};
+  }
+}
+
+async function saveOverride(key, data){
+  const prev = _overrideStore[key];
+  _overrideStore[key] = data;
+  try {
+    const res = await fetch('/api/edits/' + encodeURIComponent(key), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if(!res.ok) throw new Error('Failed to persist edit');
+    return true;
+  } catch (e) {
+    if(prev === undefined) delete _overrideStore[key];
+    else _overrideStore[key] = prev;
+    console.error('Could not save edit to edits.json', e);
+    return false;
+  }
+}
 
 // ── badge helpers ──────────────────────────────────────────────────────────
 function mkBadge(val,map){ return \`<span class="badge" style="background:\${map[val]||'#64748b'}">\${val||'—'}</span>\`; }
 
 // ── apply overrides on load ────────────────────────────────────────────────
-function applyAllOverrides(){
+async function applyAllOverrides(){
+  await loadOverrides();
   const ovr=getOverrides();
   for(const [key,data] of Object.entries(ovr)) _applyToRows(key,data);
   renumberRows();
@@ -1216,7 +1248,7 @@ function closeEdit(){
 function closeEditOnBg(e){ if(e.target===document.getElementById('editModal')) closeEdit(); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeEdit(); });
 
-function saveEdit(){
+async function saveEdit(){
   if(!_editKey) return;
   const key=_editKey;
   const ovr=getOverrides();
@@ -1233,13 +1265,17 @@ function saveEdit(){
     _edited:     true,
     _ts:         new Date().toISOString(),
   };
+
+  const persisted = await saveOverride(key, saved);
+  if(!persisted){
+    showToast('⚠ Could not save edit to edits.json');
+    return;
+  }
+
   ovr[key]=saved;
-  putOverrides(ovr);
   _applyToRows(key, saved);
   renumberRows();
   refreshAllStats();
-  // Emit event so the real-time sync layer can broadcast without coupling
-  document.dispatchEvent(new CustomEvent('cnf:edit', { detail: { key, data: saved } }));
   closeEdit();
 
   // flash (use captured key, not _editKey which closeEdit() nulled)
@@ -1267,8 +1303,8 @@ function showToast(msg){
 }
 
 // ── init ───────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{
-  applyAllOverrides();
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await applyAllOverrides();
 });
 </script>
 </body></html>`;
