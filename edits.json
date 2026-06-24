@@ -26,10 +26,10 @@
   "CNF-58730": {
     "assignee": "Michael Johnson",
     "isFalseFlag": true,
-    "ffCat": "Manual",
+    "ffCat": "Cannot Reproduce",
     "ffNotes": "",
     "_edited": true,
-    "_ts": "2026-06-24T13:34:46.099Z"
+    "_ts": "2026-06-24T14:15:26.439Z"
   },
   "CNF-58480": {
     "assignee": "Michael Johnson",

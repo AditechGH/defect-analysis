@@ -38,7 +38,10 @@ const JSONBIN_ACCESS_KEY =
   process.env['X-ACCESS-KEY'] ||
   process.env['X_ACCESS_KEY'] ||
   '';
-const JSONBIN_COLLECTION_ID = process.env.JSONBIN_COLLECTION_ID || '';
+const JSONBIN_COLLECTION_ID =
+  process.env.JSONBIN_COLLECTION_ID ||
+  process.env.CollectionId ||
+  '';
 
 let jsonBinId =
   process.env.JSONBIN_BIN_ID ||
@@ -69,9 +72,9 @@ function writeJsonBinId(id) {
   catch { /* non-fatal */ }
 }
 
-function jsonBinRequest(method, endpointPath, payload = null) {
+function jsonBinRequest(method, endpointPath, payload = null, extraHeaders = {}) {
   return new Promise((resolve, reject) => {
-    const url = new URL(endpointPath, JSONBIN_BASE);
+    const url = new URL(JSONBIN_BASE + endpointPath);
     const body = payload === null ? null : JSON.stringify(payload);
 
     const req = https.request(
@@ -82,6 +85,7 @@ function jsonBinRequest(method, endpointPath, payload = null) {
           'X-Access-Key': JSONBIN_ACCESS_KEY,
           'Content-Type': 'application/json',
           ...(body ? { 'Content-Length': Buffer.byteLength(body) } : {}),
+          ...extraHeaders,
         },
       },
       (res) => {
@@ -114,14 +118,14 @@ async function ensureJsonBinReady() {
   if (!JSONBIN_ACCESS_KEY) return false;
 
   if (!jsonBinId) {
-    const createPath = JSONBIN_COLLECTION_ID
-      ? `/b?collectionId=${encodeURIComponent(JSONBIN_COLLECTION_ID)}`
-      : '/b';
-    const created = await jsonBinRequest('POST', createPath, editStore);
+    const collectionHeader = JSONBIN_COLLECTION_ID
+      ? { 'X-Collection-Id': JSONBIN_COLLECTION_ID }
+      : {};
+    const created = await jsonBinRequest('POST', '/b', editStore, collectionHeader);
     jsonBinId = created?.metadata?.id || created?.record?.id || '';
     if (!jsonBinId) throw new Error('JSONBin create succeeded but no bin id returned');
     writeJsonBinId(jsonBinId);
-    console.log('Created JSONBin for edits persistence.');
+    console.log(`Created JSONBin bin (id: ${jsonBinId}) in collection ${JSONBIN_COLLECTION_ID || '(default)'}.`);
     return true;
   }
 
@@ -135,8 +139,29 @@ async function ensureJsonBinReady() {
 }
 
 async function persistStore() {
-  if (JSONBIN_ACCESS_KEY && jsonBinId) {
-    await jsonBinRequest('PUT', `/b/${encodeURIComponent(jsonBinId)}`, editStore);
+  if (JSONBIN_ACCESS_KEY) {
+    if (!jsonBinId) {
+      // Bin not yet created (startup init may have failed) — lazy-create now
+      const collectionHeader = JSONBIN_COLLECTION_ID
+        ? { 'X-Collection-Id': JSONBIN_COLLECTION_ID }
+        : {};
+      try {
+        const created = await jsonBinRequest('POST', '/b', editStore, collectionHeader);
+        jsonBinId = created?.metadata?.id || created?.record?.id || '';
+        if (jsonBinId) {
+          writeJsonBinId(jsonBinId);
+          console.log(`JSONBin bin created on first save (id: ${jsonBinId}).`);
+        }
+      } catch (err) {
+        console.error('JSONBin bin creation failed, saving locally only:', err.message || err);
+      }
+    } else {
+      try {
+        await jsonBinRequest('PUT', `/b/${encodeURIComponent(jsonBinId)}`, editStore);
+      } catch (err) {
+        console.error('JSONBin PUT failed, data saved locally:', err.message || err);
+      }
+    }
   }
   saveStore(editStore);
 }
