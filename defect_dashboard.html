@@ -132,6 +132,10 @@ h2.section-title{font-size:1.2rem;font-weight:600;margin:32px 0 16px;padding-bot
 .tab.active{color:var(--tab-text);background:var(--surface);border-color:var(--border);border-bottom-color:var(--bg);}
 .tab-panel{display:none;} .tab-panel.active{display:block;}
 
+@media (max-width:980px){
+  .da-two-col{grid-template-columns:1fr;}
+}
+
 /* ── search bar ── */
 .search-bar{width:100%;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;margin-bottom:20px;}
 .search-bar:focus{outline:none;border-color:var(--accent);}
@@ -143,6 +147,19 @@ h2.section-title{font-size:1.2rem;font-weight:600;margin:32px 0 16px;padding-bot
 .ff-item{padding:8px 0;border-bottom:1px solid var(--border);}
 .ff-item:last-child{border-bottom:none;}
 .ff-evidence{font-size:11px;color:var(--text2);margin-top:3px;font-style:italic;}
+
+/* ── defect analysis tab ── */
+.da-intro{color:var(--text2);margin-bottom:16px;font-size:13px;line-height:1.45;}
+.da-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;}
+.da-kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.da-kpi .v{font-size:1.35rem;font-weight:700;color:var(--accent);line-height:1.1;}
+.da-kpi .l{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+.da-two-col{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:10px;}
+.da-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.da-card h3{font-size:.82rem;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.6px;}
+.da-list{margin:0;padding-left:18px;color:var(--text);font-size:13px;line-height:1.5;}
+.da-list li{margin:6px 0;}
+.da-note{font-size:12px;color:var(--text2);margin-top:10px;}
 
 /* ── edit modal ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
@@ -187,7 +204,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
 
 <header>
   <h1>🐞 Sprint Defect Analysis Dashboard</h1>
-  <p>CNF Project · 22 June 2026 at 20:04 · 342 total issues across 10 developers</p>
+  <p>CNF Project · 24 June 2026 at 12:18 · 342 total issues across 10 developers</p>
 </header>
 
 <!-- KPIs -->
@@ -208,6 +225,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
   <div class="tab" onclick="switchTab('developers')">👥 Developer Detail</div>
   <div class="tab" onclick="switchTab('leaderboard')">🏆 Leaderboard</div>
+  <div class="tab" onclick="switchTab('defectanalysis')">🧭 Defect Analysis</div>
   <div class="tab" onclick="switchTab('falseflags')">⚑ False Flags (10)</div>
 </div>
 
@@ -274,12 +292,12 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <div class="bar-track"><div class="bar-fill" style="width:3.6%;background:#7c3aed"></div></div>
   <span class="bar-val">12 <small>(3.6%)</small></span>
 </div><div class="bar-row">
-  <span class="bar-label">Ready for Testing</span>
-  <div class="bar-track"><div class="bar-fill" style="width:2.7%;background:#2563eb"></div></div>
-  <span class="bar-val">9 <small>(2.7%)</small></span>
-</div><div class="bar-row">
   <span class="bar-label">Ready For Sprint</span>
   <div class="bar-track"><div class="bar-fill" style="width:2.7%;background:#94a3b8"></div></div>
+  <span class="bar-val">9 <small>(2.7%)</small></span>
+</div><div class="bar-row">
+  <span class="bar-label">Ready for Testing</span>
+  <div class="bar-track"><div class="bar-fill" style="width:2.7%;background:#2563eb"></div></div>
   <span class="bar-val">9 <small>(2.7%)</small></span>
 </div><div class="bar-row">
   <span class="bar-label">Blocked</span>
@@ -303,7 +321,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td style="color:var(--text2);font-size:11px">abenezer.bayu.ext@brightlysoftware.com</td>
   <td style="text-align:center">45</td>
   <td style="text-align:center"><strong>45</strong></td>
-  <td style="text-align:center;color:">0</td>
+  <td style="text-align:center">0</td>
   <td><span class="badge" style="background:#64748b">Functional</span></td>
   <td style="text-align:center" class="bounce-low">1.0</td>
   <td style="text-align:center" class="bounce-high">10</td>
@@ -401,7 +419,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td style="color:var(--text2);font-size:11px">kashish.goyal.ext@siemens.com</td>
   <td style="text-align:center">23</td>
   <td style="text-align:center"><strong>23</strong></td>
-  <td style="text-align:center;color:">0</td>
+  <td style="text-align:center">0</td>
   <td><span class="badge" style="background:#ec4899">UI / Frontend</span></td>
   <td style="text-align:center" class="bounce-mid">1.7</td>
   <td style="text-align:center" class="bounce-high">11</td>
@@ -415,7 +433,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td style="color:var(--text2);font-size:11px">abubakar.adamu.ext@brightlysoftware.com</td>
   <td style="text-align:center">20</td>
   <td style="text-align:center"><strong>20</strong></td>
-  <td style="text-align:center;color:">0</td>
+  <td style="text-align:center">0</td>
   <td><span class="badge" style="background:#6366f1">API / Backend</span></td>
   <td style="text-align:center" class="bounce-mid">1.9</td>
   <td style="text-align:center" class="bounce-high">6</td>
@@ -429,7 +447,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td style="color:var(--text2);font-size:11px">ojobe.ekpor.ext@brightlysoftware.com</td>
   <td style="text-align:center">9</td>
   <td style="text-align:center"><strong>9</strong></td>
-  <td style="text-align:center;color:">0</td>
+  <td style="text-align:center">0</td>
   <td><span class="badge" style="background:#64748b">Functional</span></td>
   <td style="text-align:center" class="bounce-low">0.2</td>
   <td style="text-align:center" class="bounce-low">1</td>
@@ -1310,7 +1328,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <div class="analysis-section highlight-card">
     <h4>⚡ Highest Bounce Issue</h4>
     <p><a href="https://brightlysoftware.atlassian.net/browse/CNF-57513" target="_blank" class="jira-link">CNF-57513</a></p>
-    <p class="small-text">UI Inconsistency | Pagination UI is not consistent </p>
+    <p class="small-text">UI Inconsistency | Pagination UI is not consistent</p>
     <p><strong>6 bounces</strong> · 8 comments · <span class="badge" style="background:#16a34a">Development Complete</span></p>
   </div>
     </div>
@@ -1476,7 +1494,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-57513" data-dev="Emmy Bbaale" class="row-odd">
   <td class="num-col">11</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-57513" target="_blank" class="jira-link">CNF-57513</a></td>
-  <td class="summary-cell" data-full="UI Inconsistency | Pagination UI is not consistent " title="UI Inconsistency | Pagination UI is not consistent ">UI Inconsistency | Pagination UI is not consistent </td>
+  <td class="summary-cell" data-full="UI Inconsistency | Pagination UI is not consistent" title="UI Inconsistency | Pagination UI is not consistent">UI Inconsistency | Pagination UI is not consistent</td>
   <td class="type-cell"><span class="badge" style="background:#ec4899">UI / Frontend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#16a34a">Low</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -1641,7 +1659,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-54948" data-dev="Emmy Bbaale" class="row-even">
   <td class="num-col">22</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-54948" target="_blank" class="jira-link">CNF-54948</a></td>
-  <td class="summary-cell" data-full="File is not getting updated/saved when giving directory location " title="File is not getting updated/saved when giving directory location ">File is not getting updated/saved when giving directory location </td>
+  <td class="summary-cell" data-full="File is not getting updated/saved when giving directory location" title="File is not getting updated/saved when giving directory location">File is not getting updated/saved when giving directory location</td>
   <td class="type-cell"><span class="badge" style="background:#64748b">Functional</span></td>
   <td class="prio-cell"><span class="badge" style="background:#ea580c">Urgent</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -1860,7 +1878,8 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td>17.9</td>
   <td class="bounce-low">0</td>
   <td>1</td>
-  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed / Expected</span></td>
+  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed /
+                      Expected</span></td>
   <td class="actions-cell"><button class="act-btn" onclick="openEdit(this)" title="Edit this defect">✏️ Edit</button></td>
 </tr>
           <tr data-key="CNF-54928" data-dev="Emmy Bbaale" class="row-odd">
@@ -1920,7 +1939,8 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td>13.1</td>
   <td class="bounce-low">0</td>
   <td>2</td>
-  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed / Expected</span></td>
+  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed /
+                      Expected</span></td>
   <td class="actions-cell"><button class="act-btn" onclick="openEdit(this)" title="Edit this defect">✏️ Edit</button></td>
 </tr>
           <tr data-key="CNF-54924" data-dev="Emmy Bbaale" class="row-odd">
@@ -2292,7 +2312,8 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td>4.8</td>
   <td class="bounce-low">0</td>
   <td>1</td>
-  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed / Expected</span></td>
+  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed /
+                      Expected</span></td>
   <td class="actions-cell"><button class="act-btn" onclick="openEdit(this)" title="Edit this defect">✏️ Edit</button></td>
 </tr>
           <tr data-key="CNF-58123" data-dev="Michael Johnson" class="row-even">
@@ -2673,7 +2694,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-55130" data-dev="Michael Johnson" class="row-odd">
   <td class="num-col">37</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-55130" target="_blank" class="jira-link">CNF-55130</a></td>
-  <td class="summary-cell" data-full="User is having no permission for delete User is still able to delete the job precedence details" title="User is having no permission for delete User is still able to delete the job precedence details">User is having no permission for delete> User is still able to delete the job pr…</td>
+  <td class="summary-cell" data-full="User is having no permission for delete User is still able to delete the job precedence details" title="User is having no permission for delete User is still able to delete the job precedence details">User is having no permission for delete User is still able to delete the job pre…</td>
   <td class="type-cell"><span class="badge" style="background:#dc2626">Security</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -2688,7 +2709,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-55129" data-dev="Michael Johnson" class="row-even">
   <td class="num-col">38</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-55129" target="_blank" class="jira-link">CNF-55129</a></td>
-  <td class="summary-cell" data-full="User having no permission to view/edit the job User is able to add the preceding and succeeding job" title="User having no permission to view/edit the job User is able to add the preceding and succeeding job">User having no permission to view/edit the job> User is able to add the precedin…</td>
+  <td class="summary-cell" data-full="User having no permission to view/edit the job User is able to add the preceding and succeeding job" title="User having no permission to view/edit the job User is able to add the preceding and succeeding job">User having no permission to view/edit the job User is able to add the preceding…</td>
   <td class="type-cell"><span class="badge" style="background:#dc2626">Security</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -2733,7 +2754,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-55122" data-dev="Michael Johnson" class="row-odd">
   <td class="num-col">41</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-55122" target="_blank" class="jira-link">CNF-55122</a></td>
-  <td class="summary-cell" data-full="On re-creating same precedingJobNumbers and succeedingJobNumbers, user gets 200ok with message Job precedents for job 2000067 saved successfully. " title="On re-creating same precedingJobNumbers and succeedingJobNumbers, user gets 200ok with message Job precedents for job 2000067 saved successfully. ">On re-creating same precedingJobNumbers and succeedingJobNumbers, user gets 200o…</td>
+  <td class="summary-cell" data-full="On re-creating same precedingJobNumbers and succeedingJobNumbers, user gets 200ok with message Job precedents for job 2000067 saved successfully." title="On re-creating same precedingJobNumbers and succeedingJobNumbers, user gets 200ok with message Job precedents for job 2000067 saved successfully.">On re-creating same precedingJobNumbers and succeedingJobNumbers, user gets 200o…</td>
   <td class="type-cell"><span class="badge" style="background:#64748b">Functional</span></td>
   <td class="prio-cell"><span class="badge" style="background:#16a34a">Low</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -2748,7 +2769,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-55121" data-dev="Michael Johnson" class="row-even">
   <td class="num-col">42</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-55121" target="_blank" class="jira-link">CNF-55121</a></td>
-  <td class="summary-cell" data-full=" Job 2000067Add same job 2000067 to preceding from API API gives 200ok but from UI its not possible to add same job and user gets error message" title=" Job 2000067Add same job 2000067 to preceding from API API gives 200ok but from UI its not possible to add same job and user gets error message"> Job 2000067>Add same job 2000067 to preceding from API> API gives 200ok but fro…</td>
+  <td class="summary-cell" data-full="Job 2000067Add same job 2000067 to preceding from API API gives 200ok but from UI its not possible to add same job and user gets error message" title="Job 2000067Add same job 2000067 to preceding from API API gives 200ok but from UI its not possible to add same job and user gets error message">Job 2000067Add same job 2000067 to preceding from API API gives 200ok but from U…</td>
   <td class="type-cell"><span class="badge" style="background:#6366f1">API / Backend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -2959,7 +2980,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-60568" data-dev="Nilesh Pore" class="row-odd">
   <td class="num-col">7</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-60568" target="_blank" class="jira-link">CNF-60568</a></td>
-  <td class="summary-cell" data-full="[FS - User Commit Limit] - Getting Server error when user enters more than 10 digit " title="[FS - User Commit Limit] - Getting Server error when user enters more than 10 digit ">[FS - User Commit Limit] - Getting Server error when user enters more than 10 di…</td>
+  <td class="summary-cell" data-full="[FS - User Commit Limit] - Getting Server error when user enters more than 10 digit" title="[FS - User Commit Limit] - Getting Server error when user enters more than 10 digit">[FS - User Commit Limit] - Getting Server error when user enters more than 10 di…</td>
   <td class="type-cell"><span class="badge" style="background:#6366f1">API / Backend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#2563eb">Medium</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -3064,7 +3085,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-57571" data-dev="Nilesh Pore" class="row-even">
   <td class="num-col">14</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-57571" target="_blank" class="jira-link">CNF-57571</a></td>
-  <td class="summary-cell" data-full="If SOR type is selected as Percentage item then %item Adjustment is not disabled. " title="If SOR type is selected as Percentage item then %item Adjustment is not disabled. ">If SOR type is selected as Percentage item then %item Adjustment is not disabled…</td>
+  <td class="summary-cell" data-full="If SOR type is selected as Percentage item then %item Adjustment is not disabled." title="If SOR type is selected as Percentage item then %item Adjustment is not disabled.">If SOR type is selected as Percentage item then %item Adjustment is not disabled…</td>
   <td class="type-cell"><span class="badge" style="background:#64748b">Functional</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -3208,7 +3229,8 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td>10.0</td>
   <td class="bounce-mid">1</td>
   <td>2</td>
-  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed / Expected</span></td>
+  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed /
+                      Expected</span></td>
   <td class="actions-cell"><button class="act-btn" onclick="openEdit(this)" title="Edit this defect">✏️ Edit</button></td>
 </tr>
           <tr data-key="CNF-57520" data-dev="Nilesh Pore" class="row-even">
@@ -3244,7 +3266,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-57193" data-dev="Nilesh Pore" class="row-even">
   <td class="num-col">26</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-57193" target="_blank" class="jira-link">CNF-57193</a></td>
-  <td class="summary-cell" data-full="When edit the Hazard Type Attribute, and edit the Display Order (enter value 4 char), Server error appears" title="When edit the Hazard Type Attribute, and edit the Display Order (enter value 4 char), Server error appears">When edit the Hazard Type Attribute, and edit the Display Order (enter value >4 …</td>
+  <td class="summary-cell" data-full="When edit the Hazard Type Attribute, and edit the Display Order (enter value 4 char), Server error appears" title="When edit the Hazard Type Attribute, and edit the Display Order (enter value 4 char), Server error appears">When edit the Hazard Type Attribute, and edit the Display Order (enter value 4 c…</td>
   <td class="type-cell"><span class="badge" style="background:#6366f1">API / Backend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#ea580c">Urgent</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -3259,7 +3281,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-57191" data-dev="Nilesh Pore" class="row-odd">
   <td class="num-col">27</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-57191" target="_blank" class="jira-link">CNF-57191</a></td>
-  <td class="summary-cell" data-full="User is not able to view the count of the attributes on the Attributes collapsable panel as present on other Web screens " title="User is not able to view the count of the attributes on the Attributes collapsable panel as present on other Web screens ">User is not able to view the count of the attributes on the Attributes collapsab…</td>
+  <td class="summary-cell" data-full="User is not able to view the count of the attributes on the Attributes collapsable panel as present on other Web screens" title="User is not able to view the count of the attributes on the Attributes collapsable panel as present on other Web screens">User is not able to view the count of the attributes on the Attributes collapsab…</td>
   <td class="type-cell"><span class="badge" style="background:#ec4899">UI / Frontend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#16a34a">Low</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -3319,7 +3341,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-57134" data-dev="Nilesh Pore" class="row-odd">
   <td class="num-col">31</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-57134" target="_blank" class="jira-link">CNF-57134</a></td>
-  <td class="summary-cell" data-full="When add the Hazard Type with 6 chars as Code, it throws Server Error(500)" title="When add the Hazard Type with 6 chars as Code, it throws Server Error(500)">When add the Hazard Type with >6 chars as Code, it throws Server Error(500)</td>
+  <td class="summary-cell" data-full="When add the Hazard Type with 6 chars as Code, it throws Server Error(500)" title="When add the Hazard Type with 6 chars as Code, it throws Server Error(500)">When add the Hazard Type with 6 chars as Code, it throws Server Error(500)</td>
   <td class="type-cell"><span class="badge" style="background:#6366f1">API / Backend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#ea580c">Urgent</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -4321,7 +4343,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-60383" data-dev="Adinan Alhassan" class="row-odd">
   <td class="num-col">1</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-60383" target="_blank" class="jira-link">CNF-60383</a></td>
-  <td class="summary-cell" data-full="[FS: Feature - JobOther ButtonLocation] - when User clicks on &quot;cancel&quot; Error message is not getting cleared" title="[FS: Feature - JobOther ButtonLocation] - when User clicks on &quot;cancel&quot; Error message is not getting cleared">[FS: Feature - Job>Other Button>Location] - when User clicks on "cancel" Error m…</td>
+  <td class="summary-cell" data-full="[FS: Feature - JobOther ButtonLocation] - when User clicks on &quot;cancel&quot; Error message is not getting cleared" title="[FS: Feature - JobOther ButtonLocation] - when User clicks on &quot;cancel&quot; Error message is not getting cleared">[FS: Feature - JobOther ButtonLocation] - when User clicks on "cancel" Error mes…</td>
   <td class="type-cell"><span class="badge" style="background:#ec4899">UI / Frontend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#2563eb">Medium</span></td>
   <td><span class="badge" style="background:#2563eb">Ready for Testing</span></td>
@@ -4336,7 +4358,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-60382" data-dev="Adinan Alhassan" class="row-even">
   <td class="num-col">2</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-60382" target="_blank" class="jira-link">CNF-60382</a></td>
-  <td class="summary-cell" data-full="[FS: Feature - JobOther ButtonLocation] - Getting &quot;Arithmetic overflow error&quot;" title="[FS: Feature - JobOther ButtonLocation] - Getting &quot;Arithmetic overflow error&quot;">[FS: Feature - Job>Other Button>Location] - Getting "Arithmetic overflow error"</td>
+  <td class="summary-cell" data-full="[FS: Feature - JobOther ButtonLocation] - Getting &quot;Arithmetic overflow error&quot;" title="[FS: Feature - JobOther ButtonLocation] - Getting &quot;Arithmetic overflow error&quot;">[FS: Feature - JobOther ButtonLocation] - Getting "Arithmetic overflow error"</td>
   <td class="type-cell"><span class="badge" style="background:#ec4899">UI / Frontend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#2563eb">Medium</span></td>
   <td><span class="badge" style="background:#7c3aed">In Testing</span></td>
@@ -4780,13 +4802,14 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td>16.9</td>
   <td class="bounce-mid">2</td>
   <td>3</td>
-  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed / Expected</span></td>
+  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed /
+                      Expected</span></td>
   <td class="actions-cell"><button class="act-btn" onclick="openEdit(this)" title="Edit this defect">✏️ Edit</button></td>
 </tr>
           <tr data-key="CNF-54985" data-dev="Adinan Alhassan" class="row-even">
   <td class="num-col">32</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-54985" target="_blank" class="jira-link">CNF-54985</a></td>
-  <td class="summary-cell" data-full="User is on 2000001 Job User is not able to add 2000001 Job in succeeding job. Whereas in legacy, user is  able to add 2000001 Job in succeeding job and same also gets add in preceeding job" title="User is on 2000001 Job User is not able to add 2000001 Job in succeeding job. Whereas in legacy, user is  able to add 2000001 Job in succeeding job and same also gets add in preceeding job">User is on 2000001 Job> User is not able to add 2000001 Job in succeeding job. W…</td>
+  <td class="summary-cell" data-full="User is on 2000001 Job User is not able to add 2000001 Job in succeeding job. Whereas in legacy, user is  able to add 2000001 Job in succeeding job and same also gets add in preceeding job" title="User is on 2000001 Job User is not able to add 2000001 Job in succeeding job. Whereas in legacy, user is  able to add 2000001 Job in succeeding job and same also gets add in preceeding job">User is on 2000001 Job User is not able to add 2000001 Job in succeeding job. Wh…</td>
   <td class="type-cell"><span class="badge" style="background:#64748b">Functional</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -4968,7 +4991,8 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
   <td>0.4</td>
   <td class="bounce-low">0</td>
   <td>1</td>
-  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed / Expected</span></td>
+  <td class="ff-cell"><span class="badge" style="background:#7c3aed">Working as Designed /
+                      Expected</span></td>
   <td class="actions-cell"><button class="act-btn" onclick="openEdit(this)" title="Edit this defect">✏️ Edit</button></td>
 </tr>
           <tr data-key="CNF-60487" data-dev="Touqeer Shakeel" class="row-even">
@@ -5746,7 +5770,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-54820" data-dev="Kashish Goyal" class="row-even">
   <td class="num-col">12</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-54820" target="_blank" class="jira-link">CNF-54820</a></td>
-  <td class="summary-cell" data-full="SECURITY ISSUEIf user is not having view permission for Mail merge then user is still able to see Mail Merger in Configuration" title="SECURITY ISSUEIf user is not having view permission for Mail merge then user is still able to see Mail Merger in Configuration">SECURITY ISSUE>If user is not having view permission for Mail merge then user is…</td>
+  <td class="summary-cell" data-full="SECURITY ISSUEIf user is not having view permission for Mail merge then user is still able to see Mail Merger in Configuration" title="SECURITY ISSUEIf user is not having view permission for Mail merge then user is still able to see Mail Merger in Configuration">SECURITY ISSUEIf user is not having view permission for Mail merge then user is …</td>
   <td class="type-cell"><span class="badge" style="background:#dc2626">Security</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -5761,7 +5785,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-54816" data-dev="Kashish Goyal" class="row-odd">
   <td class="num-col">13</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-54816" target="_blank" class="jira-link">CNF-54816</a></td>
-  <td class="summary-cell" data-full="SECURITY ISSUEIf user is not having edit/ delete permission for Mail merge then user is still able to delete and edit the mail merge details" title="SECURITY ISSUEIf user is not having edit/ delete permission for Mail merge then user is still able to delete and edit the mail merge details">SECURITY ISSUE>If user is not having edit/ delete permission for Mail merge then…</td>
+  <td class="summary-cell" data-full="SECURITY ISSUEIf user is not having edit/ delete permission for Mail merge then user is still able to delete and edit the mail merge details" title="SECURITY ISSUEIf user is not having edit/ delete permission for Mail merge then user is still able to delete and edit the mail merge details">SECURITY ISSUEIf user is not having edit/ delete permission for Mail merge then …</td>
   <td class="type-cell"><span class="badge" style="background:#dc2626">Security</span></td>
   <td class="prio-cell"><span class="badge" style="background:#dc2626">Blocker</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -5791,7 +5815,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-54814" data-dev="Kashish Goyal" class="row-odd">
   <td class="num-col">15</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-54814" target="_blank" class="jira-link">CNF-54814</a></td>
-  <td class="summary-cell" data-full="SAVE button is still enabled when user has not provided any information on edit screen of Mail merger " title="SAVE button is still enabled when user has not provided any information on edit screen of Mail merger ">SAVE button is still enabled when user has not provided any information on edit …</td>
+  <td class="summary-cell" data-full="SAVE button is still enabled when user has not provided any information on edit screen of Mail merger" title="SAVE button is still enabled when user has not provided any information on edit screen of Mail merger">SAVE button is still enabled when user has not provided any information on edit …</td>
   <td class="type-cell"><span class="badge" style="background:#ec4899">UI / Frontend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#16a34a">Low</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -6016,7 +6040,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-58042" data-dev="Abubakar Adamu" class="row-odd">
   <td class="num-col">1</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-58042" target="_blank" class="jira-link">CNF-58042</a></td>
-  <td class="summary-cell" data-full="API | Giving HTTP 200 OK even if not providing OfficerCode or StatusCode in Updates section " title="API | Giving HTTP 200 OK even if not providing OfficerCode or StatusCode in Updates section ">API | Giving HTTP 200 OK even if not providing OfficerCode or StatusCode in Upda…</td>
+  <td class="summary-cell" data-full="API | Giving HTTP 200 OK even if not providing OfficerCode or StatusCode in Updates section" title="API | Giving HTTP 200 OK even if not providing OfficerCode or StatusCode in Updates section">API | Giving HTTP 200 OK even if not providing OfficerCode or StatusCode in Upda…</td>
   <td class="type-cell"><span class="badge" style="background:#6366f1">API / Backend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -6106,7 +6130,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-57519" data-dev="Abubakar Adamu" class="row-odd">
   <td class="num-col">7</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-57519" target="_blank" class="jira-link">CNF-57519</a></td>
-  <td class="summary-cell" data-full="In lookups Sor is displayed in small letters for Sor group, Sor item and Sor Bookmark" title="In lookups Sor is displayed in small letters for Sor group, Sor item and Sor Bookmark">In lookups> Sor is displayed in small letters for Sor group, Sor item and Sor Bo…</td>
+  <td class="summary-cell" data-full="In lookups Sor is displayed in small letters for Sor group, Sor item and Sor Bookmark" title="In lookups Sor is displayed in small letters for Sor group, Sor item and Sor Bookmark">In lookups Sor is displayed in small letters for Sor group, Sor item and Sor Boo…</td>
   <td class="type-cell"><span class="badge" style="background:#ec4899">UI / Frontend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#16a34a">Low</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -6151,7 +6175,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-56485" data-dev="Abubakar Adamu" class="row-even">
   <td class="num-col">10</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-56485" target="_blank" class="jira-link">CNF-56485</a></td>
-  <td class="summary-cell" data-full="APIUser is able to provide unsupported format of document, data file and Format. No validations from API end." title="APIUser is able to provide unsupported format of document, data file and Format. No validations from API end.">API>User is able to provide unsupported format of document, data file and Format…</td>
+  <td class="summary-cell" data-full="APIUser is able to provide unsupported format of document, data file and Format. No validations from API end." title="APIUser is able to provide unsupported format of document, data file and Format. No validations from API end.">APIUser is able to provide unsupported format of document, data file and Format.…</td>
   <td class="type-cell"><span class="badge" style="background:#6366f1">API / Backend</span></td>
   <td class="prio-cell"><span class="badge" style="background:#d97706">High</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -6432,7 +6456,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
           <tr data-key="CNF-57811" data-dev="Ojobe Ekpor" class="row-odd">
   <td class="num-col">3</td>
   <td class="key-cell"><a href="https://brightlysoftware.atlassian.net/browse/CNF-57811" target="_blank" class="jira-link">CNF-57811</a></td>
-  <td class="summary-cell" data-full="	Subject Sites edit modal does not filter out dead Enquiry Subjects or apply contractor security" title="	Subject Sites edit modal does not filter out dead Enquiry Subjects or apply contractor security">	Subject Sites edit modal does not filter out dead Enquiry Subjects or apply con…</td>
+  <td class="summary-cell" data-full="Subject Sites edit modal does not filter out dead Enquiry Subjects or apply contractor security" title="Subject Sites edit modal does not filter out dead Enquiry Subjects or apply contractor security">Subject Sites edit modal does not filter out dead Enquiry Subjects or apply cont…</td>
   <td class="type-cell"><span class="badge" style="background:#dc2626">Security</span></td>
   <td class="prio-cell"><span class="badge" style="background:#ea580c">Urgent</span></td>
   <td><span class="badge" style="background:#16a34a">Development Complete</span></td>
@@ -6583,30 +6607,14 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
       </tr>
       <tr class="row-odd">
         <td class="num-col">4</td>
-        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54876" target="_blank" class="jira-link">CNF-54876</a></td>
-        <td>Abubakar Adamu</td>
-        <td class="summary-cell" title="[SECURITY ISSUES] When user does not have the access to view/update/delete/add councillor, still it is able to">[SECURITY ISSUES] When user does not have the access to view/update/de…</td>
-        <td><span class="badge" style="background:#dc2626">Security</span></td><td><span class="badge" style="background:#dc2626">Blocker</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
-        <td class="bounce-high">6</td><td>8</td>
-      </tr>
-      <tr class="row-even">
-        <td class="num-col">5</td>
-        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54813" target="_blank" class="jira-link">CNF-54813</a></td>
-        <td>Abubakar Adamu</td>
-        <td class="summary-cell" title="File Format is a text field instead of Drop down field which should contain all supported formats">File Format is a text field instead of Drop down field which should co…</td>
-        <td><span class="badge" style="background:#64748b">Functional</span></td><td><span class="badge" style="background:#2563eb">Medium</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
-        <td class="bounce-high">6</td><td>7</td>
-      </tr>
-      <tr class="row-odd">
-        <td class="num-col">6</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-57513" target="_blank" class="jira-link">CNF-57513</a></td>
         <td>Emmy Bbaale</td>
-        <td class="summary-cell" title="UI Inconsistency | Pagination UI is not consistent ">UI Inconsistency | Pagination UI is not consistent </td>
+        <td class="summary-cell" title="UI Inconsistency | Pagination UI is not consistent">UI Inconsistency | Pagination UI is not consistent</td>
         <td><span class="badge" style="background:#ec4899">UI / Frontend</span></td><td><span class="badge" style="background:#16a34a">Low</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">6</td><td>8</td>
       </tr>
       <tr class="row-even">
-        <td class="num-col">7</td>
+        <td class="num-col">5</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54913" target="_blank" class="jira-link">CNF-54913</a></td>
         <td>Emmy Bbaale</td>
         <td class="summary-cell" title="User has to provide the directory path by itself instead of selecting the path from file explorer as present in Legacy "Enterprise"">User has to provide the directory path by itself instead of selecting …</td>
@@ -6614,39 +6622,39 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <td class="bounce-high">6</td><td>10</td>
       </tr>
       <tr class="row-odd">
-        <td class="num-col">8</td>
-        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55171" target="_blank" class="jira-link">CNF-55171</a></td>
-        <td>Kashish Goyal</td>
-        <td class="summary-cell" title="For a Correspondence Log created, all the fields are not getting displayed on Web UI as per the legacy and the API response">For a Correspondence Log created, all the fields are not getting displ…</td>
-        <td><span class="badge" style="background:#6366f1">API / Backend</span></td><td><span class="badge" style="background:#2563eb">Medium</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
-        <td class="bounce-high">6</td><td>8</td>
-      </tr>
-      <tr class="row-even">
-        <td class="num-col">9</td>
+        <td class="num-col">6</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-57718" target="_blank" class="jira-link">CNF-57718</a></td>
         <td>Michael Johnson</td>
         <td class="summary-cell" title="Delete protection is incomplete — missing checks for system_default, system settings, and priority table references">Delete protection is incomplete — missing checks for system_default, s…</td>
         <td><span class="badge" style="background:#0891b2">Data / CRUD</span></td><td><span class="badge" style="background:#ea580c">Urgent</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">6</td><td>8</td>
       </tr>
+      <tr class="row-even">
+        <td class="num-col">7</td>
+        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55171" target="_blank" class="jira-link">CNF-55171</a></td>
+        <td>Kashish Goyal</td>
+        <td class="summary-cell" title="For a Correspondence Log created, all the fields are not getting displayed on Web UI as per the legacy and the API response">For a Correspondence Log created, all the fields are not getting displ…</td>
+        <td><span class="badge" style="background:#6366f1">API / Backend</span></td><td><span class="badge" style="background:#2563eb">Medium</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
+        <td class="bounce-high">6</td><td>8</td>
+      </tr>
       <tr class="row-odd">
-        <td class="num-col">10</td>
-        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-58040" target="_blank" class="jira-link">CNF-58040</a></td>
+        <td class="num-col">8</td>
+        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54876" target="_blank" class="jira-link">CNF-54876</a></td>
         <td>Abubakar Adamu</td>
-        <td class="summary-cell" title="API | Locked Job count is wrong, Update Job Batch is not working">API | Locked Job count is wrong, Update Job Batch is not working</td>
-        <td><span class="badge" style="background:#6366f1">API / Backend</span></td><td><span class="badge" style="background:#ea580c">Urgent</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
-        <td class="bounce-high">5</td><td>7</td>
+        <td class="summary-cell" title="[SECURITY ISSUES] When user does not have the access to view/update/delete/add councillor, still it is able to">[SECURITY ISSUES] When user does not have the access to view/update/de…</td>
+        <td><span class="badge" style="background:#dc2626">Security</span></td><td><span class="badge" style="background:#dc2626">Blocker</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
+        <td class="bounce-high">6</td><td>8</td>
       </tr>
       <tr class="row-even">
-        <td class="num-col">11</td>
-        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54987" target="_blank" class="jira-link">CNF-54987</a></td>
-        <td>Adinan Alhassan</td>
-        <td class="summary-cell" title="Adding job in preceding job which is also present in succeeding job gives error message - Adding this job would create a circular reference. In legacy, user is able to add the job in precedence which is also present in succeeding job">Adding job in preceding job which is also present in succeeding job gi…</td>
-        <td><span class="badge" style="background:#f59e0b">Validation</span></td><td><span class="badge" style="background:#16a34a">Low</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
-        <td class="bounce-high">5</td><td>7</td>
+        <td class="num-col">9</td>
+        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54813" target="_blank" class="jira-link">CNF-54813</a></td>
+        <td>Abubakar Adamu</td>
+        <td class="summary-cell" title="File Format is a text field instead of Drop down field which should contain all supported formats">File Format is a text field instead of Drop down field which should co…</td>
+        <td><span class="badge" style="background:#64748b">Functional</span></td><td><span class="badge" style="background:#2563eb">Medium</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
+        <td class="bounce-high">6</td><td>7</td>
       </tr>
       <tr class="row-odd">
-        <td class="num-col">12</td>
+        <td class="num-col">10</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54968" target="_blank" class="jira-link">CNF-54968</a></td>
         <td>Emmy Bbaale</td>
         <td class="summary-cell" title="Unable to allocate gang to a job if actual completion date is in past">Unable to allocate gang to a job if actual completion date is in past</td>
@@ -6654,7 +6662,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <td class="bounce-high">5</td><td>8</td>
       </tr>
       <tr class="row-even">
-        <td class="num-col">13</td>
+        <td class="num-col">11</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-58064" target="_blank" class="jira-link">CNF-58064</a></td>
         <td>Michael Johnson</td>
         <td class="summary-cell" title="GraphQL entityKey filter uses contains (substring) instead of equals — wrong history records returned">GraphQL entityKey filter uses contains (substring) instead of equals —…</td>
@@ -6662,7 +6670,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <td class="bounce-high">5</td><td>7</td>
       </tr>
       <tr class="row-odd">
-        <td class="num-col">14</td>
+        <td class="num-col">12</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-57279" target="_blank" class="jira-link">CNF-57279</a></td>
         <td>Michael Johnson</td>
         <td class="summary-cell" title="Incorrect error handling and response while deleting Job Type with existing Job dependencies">Incorrect error handling and response while deleting Job Type with exi…</td>
@@ -6670,7 +6678,7 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <td class="bounce-high">5</td><td>8</td>
       </tr>
       <tr class="row-even">
-        <td class="num-col">15</td>
+        <td class="num-col">13</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-57520" target="_blank" class="jira-link">CNF-57520</a></td>
         <td>Nilesh Pore</td>
         <td class="summary-cell" title="If user is not havng permission for asset maintenance then user is still able to see NWD in lookups">If user is not havng permission for asset maintenance then user is sti…</td>
@@ -6678,71 +6686,146 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
         <td class="bounce-high">5</td><td>6</td>
       </tr>
       <tr class="row-odd">
-        <td class="num-col">16</td>
-        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-56501" target="_blank" class="jira-link">CNF-56501</a></td>
-        <td>Abubakar Adamu</td>
-        <td class="summary-cell" title="Incorrect Options Displayed in File Format Dropdown & Mismatch Between Client and Web">Incorrect Options Displayed in File Format Dropdown & Mismatch Between…</td>
-        <td><span class="badge" style="background:#ec4899">UI / Frontend</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
-        <td class="bounce-high">4</td><td>5</td>
+        <td class="num-col">14</td>
+        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54987" target="_blank" class="jira-link">CNF-54987</a></td>
+        <td>Adinan Alhassan</td>
+        <td class="summary-cell" title="Adding job in preceding job which is also present in succeeding job gives error message - Adding this job would create a circular reference. In legacy, user is able to add the job in precedence which is also present in succeeding job">Adding job in preceding job which is also present in succeeding job gi…</td>
+        <td><span class="badge" style="background:#f59e0b">Validation</span></td><td><span class="badge" style="background:#16a34a">Low</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
+        <td class="bounce-high">5</td><td>7</td>
       </tr>
       <tr class="row-even">
-        <td class="num-col">17</td>
+        <td class="num-col">15</td>
+        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-58040" target="_blank" class="jira-link">CNF-58040</a></td>
+        <td>Abubakar Adamu</td>
+        <td class="summary-cell" title="API | Locked Job count is wrong, Update Job Batch is not working">API | Locked Job count is wrong, Update Job Batch is not working</td>
+        <td><span class="badge" style="background:#6366f1">API / Backend</span></td><td><span class="badge" style="background:#ea580c">Urgent</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
+        <td class="bounce-high">5</td><td>7</td>
+      </tr>
+      <tr class="row-odd">
+        <td class="num-col">16</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54244" target="_blank" class="jira-link">CNF-54244</a></td>
         <td>Emmy Bbaale</td>
         <td class="summary-cell" title="[Contractor PF] - Percentage uplift logic does not match the confirm enterprise">[Contractor PF] - Percentage uplift logic does not match the confirm e…</td>
         <td><span class="badge" style="background:#64748b">Functional</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">4</td><td>8</td>
       </tr>
-      <tr class="row-odd">
-        <td class="num-col">18</td>
+      <tr class="row-even">
+        <td class="num-col">17</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-57705" target="_blank" class="jira-link">CNF-57705</a></td>
         <td>Michael Johnson</td>
         <td class="summary-cell" title="No real-time UI mutual exclusion between "In Progress" and "Complete" checkboxes">No real-time UI mutual exclusion between "In Progress" and "Complete" …</td>
         <td><span class="badge" style="background:#ec4899">UI / Frontend</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">4</td><td>6</td>
       </tr>
-      <tr class="row-even">
-        <td class="num-col">19</td>
+      <tr class="row-odd">
+        <td class="num-col">18</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55130" target="_blank" class="jira-link">CNF-55130</a></td>
         <td>Michael Johnson</td>
-        <td class="summary-cell" title="User is having no permission for delete> User is still able to delete the job precedence details">User is having no permission for delete> User is still able to delete …</td>
+        <td class="summary-cell" title="User is having no permission for delete User is still able to delete the job precedence details">User is having no permission for delete User is still able to delete t…</td>
+        <td><span class="badge" style="background:#dc2626">Security</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
+        <td class="bounce-high">4</td><td>6</td>
+      </tr>
+      <tr class="row-even">
+        <td class="num-col">19</td>
+        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55129" target="_blank" class="jira-link">CNF-55129</a></td>
+        <td>Michael Johnson</td>
+        <td class="summary-cell" title="User having no permission to view/edit the job User is able to add the preceding and succeeding job">User having no permission to view/edit the job User is able to add the…</td>
         <td><span class="badge" style="background:#dc2626">Security</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">4</td><td>6</td>
       </tr>
       <tr class="row-odd">
         <td class="num-col">20</td>
-        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55129" target="_blank" class="jira-link">CNF-55129</a></td>
-        <td>Michael Johnson</td>
-        <td class="summary-cell" title="User having no permission to view/edit the job> User is able to add the preceding and succeeding job">User having no permission to view/edit the job> User is able to add th…</td>
-        <td><span class="badge" style="background:#dc2626">Security</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
-        <td class="bounce-high">4</td><td>6</td>
-      </tr>
-      <tr class="row-even">
-        <td class="num-col">21</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-57193" target="_blank" class="jira-link">CNF-57193</a></td>
         <td>Nilesh Pore</td>
-        <td class="summary-cell" title="When edit the Hazard Type Attribute, and edit the Display Order (enter value >4 char), Server error appears">When edit the Hazard Type Attribute, and edit the Display Order (enter…</td>
+        <td class="summary-cell" title="When edit the Hazard Type Attribute, and edit the Display Order (enter value 4 char), Server error appears">When edit the Hazard Type Attribute, and edit the Display Order (enter…</td>
         <td><span class="badge" style="background:#6366f1">API / Backend</span></td><td><span class="badge" style="background:#ea580c">Urgent</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">4</td><td>5</td>
       </tr>
-      <tr class="row-odd">
-        <td class="num-col">22</td>
+      <tr class="row-even">
+        <td class="num-col">21</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-56999" target="_blank" class="jira-link">CNF-56999</a></td>
         <td>Nilesh Pore</td>
         <td class="summary-cell" title="UI Mismatch Issues in Web than the legacy Confirm Enterprise">UI Mismatch Issues in Web than the legacy Confirm Enterprise</td>
         <td><span class="badge" style="background:#ec4899">UI / Frontend</span></td><td><span class="badge" style="background:#16a34a">Low</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">4</td><td>5</td>
       </tr>
-      <tr class="row-even">
-        <td class="num-col">23</td>
+      <tr class="row-odd">
+        <td class="num-col">22</td>
         <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55178" target="_blank" class="jira-link">CNF-55178</a></td>
         <td>Touqeer Shakeel</td>
         <td class="summary-cell" title="[Site Uplift] Clear button is not available for Site Uplift Selection screen">[Site Uplift] Clear button is not available for Site Uplift Selection …</td>
         <td><span class="badge" style="background:#ec4899">UI / Frontend</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
         <td class="bounce-high">4</td><td>6</td>
       </tr>
+      <tr class="row-even">
+        <td class="num-col">23</td>
+        <td><a href="https://brightlysoftware.atlassian.net/browse/CNF-56501" target="_blank" class="jira-link">CNF-56501</a></td>
+        <td>Abubakar Adamu</td>
+        <td class="summary-cell" title="Incorrect Options Displayed in File Format Dropdown & Mismatch Between Client and Web">Incorrect Options Displayed in File Format Dropdown & Mismatch Between…</td>
+        <td><span class="badge" style="background:#ec4899">UI / Frontend</span></td><td><span class="badge" style="background:#d97706">High</span></td><td><span class="badge" style="background:#16a34a">Development Complete</span></td>
+        <td class="bounce-high">4</td><td>5</td>
+      </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- ── Defect analysis tab ── -->
+<div class="tab-panel" id="tab-defectanalysis">
+  <h2 class="section-title">Defect Classification and Prevention Report</h2>
+  <p class="da-intro">
+    Classification and prevention guidance generated from all live defect rows, including false flags raised by QA. This report updates after edits and reassignments so actions stay aligned with current data.
+  </p>
+
+  <div class="da-kpis">
+    <div class="da-kpi"><div class="v" id="da-real-total">0</div><div class="l">Defects Analysed</div></div>
+    <div class="da-kpi"><div class="v" id="da-ff-included">0</div><div class="l">False Flags Included</div></div>
+    <div class="da-kpi"><div class="v" id="da-high-risk">0</div><div class="l">High-Risk (Blocker/Urgent)</div></div>
+    <div class="da-kpi"><div class="v" id="da-bounce-risk">0</div><div class="l">High Bounce (>=3)</div></div>
+    <div class="da-kpi"><div class="v" id="da-repeat-signals">0</div><div class="l">Repeat Failure Signals</div></div>
+  </div>
+
+  <div class="da-card">
+    <h3>Defect Classification and Gates</h3>
+    <div class="table-wrapper">
+      <table class="issue-table">
+        <thead>
+          <tr>
+            <th class="num-col">#</th>
+            <th>Classification</th>
+            <th>Count</th>
+            <th>Share</th>
+            <th>Recurring Signals</th>
+            <th>Prevention Measures / Gates</th>
+          </tr>
+        </thead>
+        <tbody id="da-type-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="da-two-col">
+    <div class="da-card">
+      <h3>Top Recurring Defect Patterns</h3>
+      <div class="table-wrapper">
+        <table class="issue-table">
+          <thead>
+            <tr>
+              <th class="num-col">#</th>
+              <th>Pattern</th>
+              <th>Hits</th>
+              <th>Suggested Gate</th>
+            </tr>
+          </thead>
+          <tbody id="da-pattern-rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="da-card">
+      <h3>Immediate Quality Gates</h3>
+      <ol class="da-list" id="da-gate-list"></ol>
+      <p class="da-note">Tip: Apply these as Definition of Done checks in PR templates, test charters, and release readiness gates.</p>
+    </div>
   </div>
 </div>
 
@@ -6755,132 +6838,129 @@ footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:12px;b
     or tester used incorrect procedure. Issues where a fix build was delivered first are <em>excluded</em>.
   </p>
   <div id="ff-sections">
-  
-  <div class="ff-category-card">
-    <h3>📋 Tester Procedure Issue — 1</h3>
+  <div class="ff-category-card" data-ff-cat="Working as Designed /
+                      Expected">
+    <h3>✅ Working as Designed /
+                      Expected — 6</h3>
     
-    <div class="ff-item" data-ff-key="CNF-55482">
-      <a href="https://brightlysoftware.atlassian.net/browse/CNF-55482" target="_blank" class="jira-link">CNF-55482</a>
-      <span class="badge" style="background:#dc2626">Blocker</span> <span class="badge" style="background:#dc2626">Security</span>
-      <strong style="margin-left:8px">Adinan Alhassan</strong>
-      <span style="color:var(--text2);margin-left:8px;font-size:12px">Tenant-Level Security Missing for Contract Preparation Module in Confirm Web</span>
-      <div class="ff-evidence">"adinan alhassan: "@Sameer Sagwan   
-  
-To ensure the changes take effect:  
-  
-1\. Update the permissions.  
-2\. Sign out of the web application and sign back in.  
-3\.""</div>
-    </div>
-  </div>
-  <div class="ff-category-card">
-    <h3>✅ Working as Designed / Expected — 6</h3>
-    
-    <div class="ff-item" data-ff-key="CNF-54986">
-      <a href="https://brightlysoftware.atlassian.net/browse/CNF-54986" target="_blank" class="jira-link">CNF-54986</a>
-      <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#64748b">Functional</span>
-      <strong style="margin-left:8px">Adinan Alhassan</strong>
-      <span style="color:var(--text2);margin-left:8px;font-size:12px">User is not able to add same job(for which user is creating job precedence) in j…</span>
-      <div class="ff-evidence">"adinan alhassan (dev): "@ambika mehra This is the expected behavior. Kindly test the legacy application again. This only occurs when you add a committed job in the succeeding""</div>
-    </div>
-    <div class="ff-item" data-ff-key="CNF-54929">
+    <div class="ff-item" data-ff-key="CNF-54929" data-ff-dev="Emmy Bbaale" data-ff-cat="Working as Designed /
+                      Expected" data-ff-prio="Blocker" data-ff-type="Security">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-54929" target="_blank" class="jira-link">CNF-54929</a>
       <span class="badge" style="background:#dc2626">Blocker</span> <span class="badge" style="background:#dc2626">Security</span>
       <strong style="margin-left:8px">Emmy Bbaale</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">User permissions not enforced for multiple lookup entities in Commitment module</span>
-      <div class="ff-evidence">"Sameer Sagwan (tester): "@abubakar adamu  View permission is still not enforced correctly.
+      <div class="ff-evidence">"Sameer Sagwan (tester): "@abubakar adamu View permission is still not enforced
+              correctly.
 
-If a user does not have _View_ permission for a particular lookup, they are still a""</div>
+              If a user does not have _View_ permission for a particular…"</div>
     </div>
-    <div class="ff-item" data-ff-key="CNF-54925">
+    <div class="ff-item" data-ff-key="CNF-54925" data-ff-dev="Emmy Bbaale" data-ff-cat="Working as Designed /
+                      Expected" data-ff-prio="High" data-ff-type="Validation">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-54925" target="_blank" class="jira-link">CNF-54925</a>
       <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#f59e0b">Validation</span>
       <strong style="margin-left:8px">Emmy Bbaale</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">Directory and File Type are not mandatory fields</span>
-      <div class="ff-evidence">"ambika mehra (tester): "Verified and now directory path and file type are mandatory fields and thus working as expected
+      <div class="ff-evidence">"ambika mehra (tester): "Verified and now directory path and file type are
+              mandatory fields and thus working as expected
 
-Closing this defect""</div>
+              Closing this defect""</div>
     </div>
-    <div class="ff-item" data-ff-key="CNF-58124">
+    <div class="ff-item" data-ff-key="CNF-58124" data-ff-dev="Michael Johnson" data-ff-cat="Working as Designed /
+                      Expected" data-ff-prio="Blocker" data-ff-type="API / Backend">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-58124" target="_blank" class="jira-link">CNF-58124</a>
       <span class="badge" style="background:#dc2626">Blocker</span> <span class="badge" style="background:#6366f1">API / Backend</span>
       <strong style="margin-left:8px">Michael Johnson</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">Delete restriction missing — Referenced documents already linked to a Job can st…</span>
-      <div class="ff-evidence">"Sameer Sagwan (tester): "@Michael Johnson  Changes have been verified and it is working as expected. Delete Icon is not available for the same document.
+      <div class="ff-evidence">"Sameer Sagwan (tester): "@Michael Johnson Changes have been verified and it is
+              working as expected. Delete Icon is not available for the same document.
 
-![](blob:https://medi""</div>
+          …"</div>
     </div>
-    <div class="ff-item" data-ff-key="CNF-57522">
+    <div class="ff-item" data-ff-key="CNF-57522" data-ff-dev="Nilesh Pore" data-ff-cat="Working as Designed /
+                      Expected" data-ff-prio="Low" data-ff-type="UI / Frontend">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-57522" target="_blank" class="jira-link">CNF-57522</a>
       <span class="badge" style="background:#16a34a">Low</span> <span class="badge" style="background:#ec4899">UI / Frontend</span>
       <strong style="margin-left:8px">Nilesh Pore</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">On Marking priority from Dead to non dead with toggle button, 2 confirmation pop…</span>
-      <div class="ff-evidence">"nilesh pore (dev): "This is expected behavior: the user performed two actions, so two success messages appear. Each success message disappears after a set time. If the us""</div>
+      <div class="ff-evidence">"nilesh pore (dev): "This is expected behavior: the user performed two actions, so
+              two success messages appear. Each success message disappears after a set time. If t…"</div>
     </div>
-    <div class="ff-item" data-ff-key="CNF-60645">
+    <div class="ff-item" data-ff-key="CNF-54986" data-ff-dev="Adinan Alhassan" data-ff-cat="Working as Designed /
+                      Expected" data-ff-prio="High" data-ff-type="Functional">
+      <a href="https://brightlysoftware.atlassian.net/browse/CNF-54986" target="_blank" class="jira-link">CNF-54986</a>
+      <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#64748b">Functional</span>
+      <strong style="margin-left:8px">Adinan Alhassan</strong>
+      <span style="color:var(--text2);margin-left:8px;font-size:12px">User is not able to add same job(for which user is creating job precedence) in j…</span>
+      <div class="ff-evidence">"adinan alhassan (dev): "@ambika mehra This is the expected behavior. Kindly test
+              the legacy application again. This only occurs when you add a committed job in the s…"</div>
+    </div>
+    <div class="ff-item" data-ff-key="CNF-60645" data-ff-dev="Touqeer Shakeel" data-ff-cat="Working as Designed /
+                      Expected" data-ff-prio="Medium" data-ff-type="Validation">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-60645" target="_blank" class="jira-link">CNF-60645</a>
       <span class="badge" style="background:#2563eb">Medium</span> <span class="badge" style="background:#f59e0b">Validation</span>
       <strong style="margin-left:8px">Touqeer Shakeel</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">[Tax Type] - Start Date and End Date fields missing mandatory indicator and vali…</span>
       <div class="ff-evidence">"Prabhat Gaddam (tester): "Retested the reported Issue, working as expected:
 
-![](blob:https://media.staging.atl-paas.net/?type=file&localId=86c689099ec7&id=8c9b1e96-81c6-4333-a""</div>
+              ![](blob:https://media.staging.atl-paas.net/?type=file&localId=86c689099ec7&id=8c9b1e96…"</div>
     </div>
   </div>
-  <div class="ff-category-card">
+  <div class="ff-category-card" data-ff-cat="Cannot Reproduce">
     <h3>🔍 Cannot Reproduce — 3</h3>
     
-    <div class="ff-item" data-ff-key="CNF-60486">
-      <a href="https://brightlysoftware.atlassian.net/browse/CNF-60486" target="_blank" class="jira-link">CNF-60486</a>
-      <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#f59e0b">Validation</span>
-      <strong style="margin-left:8px">Touqeer Shakeel</strong>
-      <span style="color:var(--text2);margin-left:8px;font-size:12px">[Financial Period] - Unable to create Finance Period within valid Finance Year —…</span>
-      <div class="ff-evidence">"touqeer shakeel (dev): "@Prabhat Gaddam please check, I am unable to reproduce this.""</div>
-    </div>
-    <div class="ff-item" data-ff-key="CNF-60178">
+    <div class="ff-item" data-ff-key="CNF-60178" data-ff-dev="Bhanu Teja" data-ff-cat="Cannot Reproduce" data-ff-prio="Medium" data-ff-type="Functional">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-60178" target="_blank" class="jira-link">CNF-60178</a>
       <span class="badge" style="background:#2563eb">Medium</span> <span class="badge" style="background:#64748b">Functional</span>
       <strong style="margin-left:8px">Bhanu Teja</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">[Contract Creation] - Web is allowing to allot a contractor to new contract, ent…</span>
-      <div class="ff-evidence">"Mahipal Rathore (tester): "Issue not reproducible on oracle setup, env issue, closing the bug.""</div>
+      <div class="ff-evidence">"Mahipal Rathore (tester): "Issue not reproducible on oracle setup, env issue,
+              closing the bug.""</div>
     </div>
-    <div class="ff-item" data-ff-key="CNF-59629">
+    <div class="ff-item" data-ff-key="CNF-59629" data-ff-dev="Bhanu Teja" data-ff-cat="Cannot Reproduce" data-ff-prio="High" data-ff-type="API / Backend">
       <a href="https://brightlysoftware.atlassian.net/browse/CNF-59629" target="_blank" class="jira-link">CNF-59629</a>
       <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#6366f1">API / Backend</span>
       <strong style="margin-left:8px">Bhanu Teja</strong>
       <span style="color:var(--text2);margin-left:8px;font-size:12px">[Trunk - Contract Regime] - upsertContractRegimes api is failing on Trunk build</span>
-      <div class="ff-evidence">"Mahipal Rathore (tester): "Issue not reproducible on NB05 server. Closing the defect.""</div>
+      <div class="ff-evidence">"Mahipal Rathore (tester): "Issue not reproducible on NB05 server. Closing the
+              defect.""</div>
+    </div>
+    <div class="ff-item" data-ff-key="CNF-60486" data-ff-dev="Touqeer Shakeel" data-ff-cat="Cannot Reproduce" data-ff-prio="High" data-ff-type="Validation">
+      <a href="https://brightlysoftware.atlassian.net/browse/CNF-60486" target="_blank" class="jira-link">CNF-60486</a>
+      <span class="badge" style="background:#d97706">High</span> <span class="badge" style="background:#f59e0b">Validation</span>
+      <strong style="margin-left:8px">Touqeer Shakeel</strong>
+      <span style="color:var(--text2);margin-left:8px;font-size:12px">[Financial Period] - Unable to create Finance Period within valid Finance Year —…</span>
+      <div class="ff-evidence">"Flagged from dashboard"</div>
     </div>
   </div>
+  <div class="ff-category-card" data-ff-cat="Tester Procedure Issue">
+    <h3>📋 Tester Procedure Issue — 1</h3>
+    
+    <div class="ff-item" data-ff-key="CNF-55482" data-ff-dev="Adinan Alhassan" data-ff-cat="Tester Procedure Issue" data-ff-prio="Blocker" data-ff-type="Security">
+      <a href="https://brightlysoftware.atlassian.net/browse/CNF-55482" target="_blank" class="jira-link">CNF-55482</a>
+      <span class="badge" style="background:#dc2626">Blocker</span> <span class="badge" style="background:#dc2626">Security</span>
+      <strong style="margin-left:8px">Adinan Alhassan</strong>
+      <span style="color:var(--text2);margin-left:8px;font-size:12px">Tenant-Level Security Missing for Contract Preparation Module in Confirm Web</span>
+      <div class="ff-evidence">"adinan alhassan: "@Sameer Sagwan
+
+              To ensure the changes take effect:
+
+              1\. Update the permissions.
+              2\. Sign out of the web application…"</div>
     </div>
+  </div>
+  </div>
   <h2 class="section-title" style="margin-top:32px">False Flags by Developer</h2>
   <div class="lb-grid" id="ff-by-dev-grid">
     
     <div class="lb-card" style="border-color:var(--purple)">
-      <h3 style="color:var(--purple)">Adinan Alhassan — 2</h3>
-      <table><tbody>
-      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55482" target="_blank" class="jira-link">CNF-55482</a></td>
-      <td><span class="badge" style="background:#dc2626">Blocker</span></td><td style="font-size:11px;color:var(--text2)">Tester Procedure Issue</td></tr>
-      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54986" target="_blank" class="jira-link">CNF-54986</a></td>
-      <td><span class="badge" style="background:#d97706">High</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed / Expected</td></tr>
-      </tbody></table>
-    </div>
-    <div class="lb-card" style="border-color:var(--purple)">
       <h3 style="color:var(--purple)">Emmy Bbaale — 2</h3>
       <table><tbody>
       <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54929" target="_blank" class="jira-link">CNF-54929</a></td>
-      <td><span class="badge" style="background:#dc2626">Blocker</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed / Expected</td></tr>
+      <td><span class="badge" style="background:#dc2626">Blocker</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed /
+                      Expected</td></tr>
       <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54925" target="_blank" class="jira-link">CNF-54925</a></td>
-      <td><span class="badge" style="background:#d97706">High</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed / Expected</td></tr>
-      </tbody></table>
-    </div>
-    <div class="lb-card" style="border-color:var(--purple)">
-      <h3 style="color:var(--purple)">Touqeer Shakeel — 2</h3>
-      <table><tbody>
-      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-60645" target="_blank" class="jira-link">CNF-60645</a></td>
-      <td><span class="badge" style="background:#2563eb">Medium</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed / Expected</td></tr>
-      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-60486" target="_blank" class="jira-link">CNF-60486</a></td>
-      <td><span class="badge" style="background:#d97706">High</span></td><td style="font-size:11px;color:var(--text2)">Cannot Reproduce</td></tr>
+      <td><span class="badge" style="background:#d97706">High</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed /
+                      Expected</td></tr>
       </tbody></table>
     </div>
     <div class="lb-card" style="border-color:var(--purple)">
@@ -6893,17 +6973,39 @@ Closing this defect""</div>
       </tbody></table>
     </div>
     <div class="lb-card" style="border-color:var(--purple)">
+      <h3 style="color:var(--purple)">Adinan Alhassan — 2</h3>
+      <table><tbody>
+      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-55482" target="_blank" class="jira-link">CNF-55482</a></td>
+      <td><span class="badge" style="background:#dc2626">Blocker</span></td><td style="font-size:11px;color:var(--text2)">Tester Procedure Issue</td></tr>
+      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-54986" target="_blank" class="jira-link">CNF-54986</a></td>
+      <td><span class="badge" style="background:#d97706">High</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed /
+                      Expected</td></tr>
+      </tbody></table>
+    </div>
+    <div class="lb-card" style="border-color:var(--purple)">
+      <h3 style="color:var(--purple)">Touqeer Shakeel — 2</h3>
+      <table><tbody>
+      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-60645" target="_blank" class="jira-link">CNF-60645</a></td>
+      <td><span class="badge" style="background:#2563eb">Medium</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed /
+                      Expected</td></tr>
+      <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-60486" target="_blank" class="jira-link">CNF-60486</a></td>
+      <td><span class="badge" style="background:#d97706">High</span></td><td style="font-size:11px;color:var(--text2)">Cannot Reproduce</td></tr>
+      </tbody></table>
+    </div>
+    <div class="lb-card" style="border-color:var(--purple)">
       <h3 style="color:var(--purple)">Michael Johnson — 1</h3>
       <table><tbody>
       <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-58124" target="_blank" class="jira-link">CNF-58124</a></td>
-      <td><span class="badge" style="background:#dc2626">Blocker</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed / Expected</td></tr>
+      <td><span class="badge" style="background:#dc2626">Blocker</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed /
+                      Expected</td></tr>
       </tbody></table>
     </div>
     <div class="lb-card" style="border-color:var(--purple)">
       <h3 style="color:var(--purple)">Nilesh Pore — 1</h3>
       <table><tbody>
       <tr><td><a href="https://brightlysoftware.atlassian.net/browse/CNF-57522" target="_blank" class="jira-link">CNF-57522</a></td>
-      <td><span class="badge" style="background:#16a34a">Low</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed / Expected</td></tr>
+      <td><span class="badge" style="background:#16a34a">Low</span></td><td style="font-size:11px;color:var(--text2)">Working as Designed /
+                      Expected</td></tr>
       </tbody></table>
     </div>
   </div>
@@ -6964,7 +7066,7 @@ Closing this defect""</div>
 <!-- Toast notification -->
 <div class="toast" id="toast"></div>
 
-<footer>Generated by Claude Code · CNF Sprint Defect Analysis · 22 June 2026 at 20:04 · brightlysoftware.atlassian.net</footer>
+<footer>Generated by Claude Code · CNF Sprint Defect Analysis · 24 June 2026 at 12:18 · brightlysoftware.atlassian.net</footer>
 </div><!-- /page -->
 
 <script>
@@ -7078,13 +7180,14 @@ function refreshAllStats(){
   document.querySelectorAll('.dev-card').forEach(card=>{
     const devName=card.querySelector('.dev-info h3')?.textContent?.trim()||'';
     let total=0, real=0, ffs=0, bounceSum=0;
-    let maxBounce=0, maxBounceKey='', rftSum=0, rftCount=0, closeSum=0, closeCount=0, blockers=0;
+    let maxBounce=0, maxBounceKey='', rftSum=0, rftCount=0, closeSum=0, closeCount=0;
+    let blockers=0;
     card.querySelectorAll('tr[data-key]').forEach(row=>{
       if(row.style.display==='none') return;
       total++;
       const isFF=row.classList.contains('ff-row');
       if(isFF) ffs++; else real++;
-      // col 9=bounces, col 7=rft days, col 8=close days, col 4=priority badge
+      // col 9 = bounces, col 7 = rft days, col 8 = close days, col 4 = priority badge
       const b=parseInt(row.cells[9]?.textContent||'0')||0;
       bounceSum+=b;
       if(!isFF){
@@ -7093,7 +7196,8 @@ function refreshAllStats(){
         if(!isNaN(rft)){ rftSum+=rft; rftCount++; }
         const cl=parseFloat(row.cells[8]?.textContent||'');
         if(!isNaN(cl)){ closeSum+=cl; closeCount++; }
-        if((row.cells[4]?.textContent||'').trim()==='Blocker') blockers++;
+        const prioText=row.cells[4]?.textContent?.trim()||'';
+        if(prioText==='Blocker') blockers++;
       }
     });
     const avgBounces=total?+(bounceSum/total).toFixed(1):0;
@@ -7147,110 +7251,126 @@ function refreshAllStats(){
     }
   });
 
-  // Keep leaderboard and false-flags panels in sync with edits
+  // Keep leaderboard and false-flags panels in sync
   refreshLeaderboard(devStats);
   refreshFalseFlags();
+  refreshDefectAnalysis();
 }
 
 // ── Rebuild leaderboard cards from live devStats ───────────────────────────
 function refreshLeaderboard(devStats){
   const grid=document.getElementById('lb-cards-grid');
   if(!grid) return;
+
   const rkClr=['#f59e0b','#94a3b8','#b45309'];
-  const fmt1=v=>v===null||v===undefined?'—':typeof v==='number'?v.toFixed(1):v;
+  function rank(bg,n){ return `<span class="rank" style="background:${bg}">${n}</span>`; }
   function lbRowHtml(i,name,val,cls=''){
     const bg=i<3?rkClr[i]:'#64748b';
-    return `<tr><td><span class="rank" style="background:${bg}">${i+1}</span></td><td>${name}</td><td class="${cls}"><strong>${val}</strong></td></tr>`;
+    return `<tr><td>${rank(bg,i+1)}</td><td>${name}</td><td class="${cls}"><strong>${val}</strong></td></tr>`;
   }
   function card(title,rows){
     return `<div class="lb-card"><h3>${title}</h3><table><tbody>${rows}</tbody></table></div>`;
   }
+  const fmt1=v=>v===null||v===undefined?'—':typeof v==='number'?v.toFixed(1):v;
   const entries=Object.entries(devStats);
 
   // 1 – Most Real Defects
+  const byReal=[...entries].sort((a,b)=>b[1].real-a[1].real);
   const c1=card('🔢 Most Real Defects',
-    [...entries].sort((a,b)=>b[1].real-a[1].real)
-      .map(([name,s],i)=>lbRowHtml(i,name,s.real)).join(''));
+    byReal.map(([name,s],i)=>lbRowHtml(i,name,s.real)).join(''));
 
   // 2 – Avg Bounces (lower = better)
+  const byBounce=[...entries].sort((a,b)=>a[1].avgBounces-b[1].avgBounces);
   const c2=card('⚡ Avg Bounces (lower = better)',
-    [...entries].sort((a,b)=>a[1].avgBounces-b[1].avgBounces)
-      .map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgBounces),s.avgBounces>=3?'bounce-high':s.avgBounces>=1.5?'bounce-mid':'')).join(''));
+    byBounce.map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgBounces),s.avgBounces>=3?'bounce-high':s.avgBounces>=1.5?'bounce-mid':'')).join(''));
 
   // 3 – Fastest to RFT
   const withRft=entries.filter(([,s])=>s.avgRft!==null).sort((a,b)=>a[1].avgRft-b[1].avgRft);
-  const noRft=entries.filter(([,s])=>s.avgRft===null);
+  const noRft =entries.filter(([,s])=>s.avgRft===null);
   const c3=card('⏱ Fastest to Ready for Testing',
     withRft.map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgRft)+' d')).join('')+
     noRft.map(([name])=>`<tr><td><span class="rank" style="background:#475569">—</span></td><td>${name}</td><td style="color:var(--text2)">No data</td></tr>`).join(''));
 
   // 4 – Fastest to Close
+  const withClose=entries.filter(([,s])=>s.avgClose!==null).sort((a,b)=>a[1].avgClose-b[1].avgClose);
   const c4=card('✅ Fastest to Close',
-    entries.filter(([,s])=>s.avgClose!==null).sort((a,b)=>a[1].avgClose-b[1].avgClose)
-      .map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgClose)+' d')).join(''));
+    withClose.map(([name,s],i)=>lbRowHtml(i,name,fmt1(s.avgClose)+' d')).join(''));
 
   // 5 – Most Blockers
+  const byBlockers=[...entries].sort((a,b)=>b[1].blockers-a[1].blockers);
   const c5=card('🚨 Most Blockers',
-    [...entries].sort((a,b)=>b[1].blockers-a[1].blockers)
-      .map(([name,s],i)=>lbRowHtml(i,name,s.blockers,s.blockers>3?'bounce-high':'')).join(''));
+    byBlockers.map(([name,s],i)=>lbRowHtml(i,name,s.blockers,s.blockers>3?'bounce-high':'')).join(''));
 
   // 6 – Max Single-Issue Bounces
+  const byMaxBounce=[...entries].sort((a,b)=>b[1].maxBounce-a[1].maxBounce);
   const c6=card('🔴 Max Single-Issue Bounces',
-    [...entries].sort((a,b)=>b[1].maxBounce-a[1].maxBounce)
-      .map(([name,s],i)=>{
-        const label=name+(s.maxBounceKey?` <span style="color:var(--text2);font-size:11px">(${s.maxBounceKey})</span>`:'');
-        return lbRowHtml(i,label,s.maxBounce,s.maxBounce>=8?'bounce-high':s.maxBounce>=5?'bounce-mid':'');
-      }).join(''));
+    byMaxBounce.map(([name,s],i)=>{
+      const label=name+(s.maxBounceKey?` <span style="color:var(--text2);font-size:11px">(${s.maxBounceKey})</span>`:'');
+      return lbRowHtml(i,label,s.maxBounce,s.maxBounce>=8?'bounce-high':s.maxBounce>=5?'bounce-mid':'');
+    }).join(''));
 
   grid.innerHTML=c1+c2+c3+c4+c5+c6;
 }
 
 // ── Rebuild false-flags sections from live ff-row state ────────────────────
+// Evidence text is preserved via data attributes stamped at generation time.
 function refreshFalseFlags(){
   const sections=document.getElementById('ff-sections');
   const byDevGrid=document.getElementById('ff-by-dev-grid');
-  if(!sections||!byDevGrid) return;
+  if(!sections || !byDevGrid) return;
 
   // Collect live false-flag rows from developer cards
   const ffByCat={}, ffByDev={};
   document.querySelectorAll('#tab-developers tr[data-key].ff-row').forEach(row=>{
     if(row.style.display==='none') return;
-    const key=row.dataset.key||'';
-    const dev=row.dataset.dev||row.closest('.dev-card')?.querySelector('.dev-info h3')?.textContent?.trim()||'';
-    const catEl=row.cells[11]?.querySelector('.badge');
-    const cat=catEl?.textContent?.trim()||'Manual';
-    const prio=(row.cells[4]?.textContent||'').trim();
-    const type=(row.cells[3]?.textContent||'').trim();
-    const summary=row.cells[2]?.dataset?.full||row.cells[2]?.textContent?.trim()||'';
+    const key   = row.dataset.key||'';
+    const dev   = row.dataset.dev||row.closest('.dev-card')?.querySelector('.dev-info h3')?.textContent?.trim()||'';
+    // Try to read category from ff-cell badge (col 11)
+    const catEl = row.cells[11]?.querySelector('.badge');
+    const cat   = catEl?.textContent?.trim()||'Manual';
+    const prio  = row.cells[4]?.querySelector('.badge')?.textContent?.trim()||'';
+    const type  = row.cells[3]?.querySelector('.badge')?.textContent?.trim()||'';
+    const summary = row.cells[2]?.dataset?.full || row.cells[2]?.textContent?.trim()||'';
+
+    // Recover evidence from the original ff-item element (it still exists in DOM,
+    // just the category headings are rebuilt — keep items as-is, only update headers)
     const entry={key,dev,cat,prio,type,summary};
     (ffByCat[cat]||(ffByCat[cat]=[])).push(entry);
     (ffByDev[dev] ||(ffByDev[dev] =[])).push(entry);
   });
 
-  // Cache original ff-item nodes by key (they hold the evidence text)
+  // Rebuild category cards — preserve inner ff-item nodes (they have the evidence text),
+  // only update the heading count and create/remove category blocks as needed.
+  const catOrder=['Tester Procedure Issue','Working as Designed / Expected','Cannot Reproduce','API Already Correct','Environment / Config Issue','Manual'];
+  const catIcon={
+    'Cannot Reproduce':'🔍','Tester Procedure Issue':'📋',
+    'API Already Correct':'🔧','Environment / Config Issue':'⚙️',
+  };
+  function catHdIcon(c){ return catIcon[c]||'✅'; }
+
+  // Index existing ff-item nodes by key so we can reuse them
   const existingItems={};
   sections.querySelectorAll('.ff-item[data-ff-key]').forEach(el=>{
     existingItems[el.dataset.ffKey]=el;
   });
 
-  // Rebuild category blocks, reusing preserved item nodes for evidence text
-  const catIcon={'Cannot Reproduce':'🔍','Tester Procedure Issue':'📋','API Already Correct':'🔧','Environment / Config Issue':'⚙️'};
-  const allCats=[...new Set(['Tester Procedure Issue','Working as Designed / Expected','Cannot Reproduce','API Already Correct','Environment / Config Issue','Manual',...Object.keys(ffByCat)])].filter(c=>ffByCat[c]);
-  const prioBg={Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
-  const typeBg={'API / Backend':'#6366f1','UI / Frontend':'#ec4899',Security:'#dc2626',Validation:'#f59e0b','Data / CRUD':'#0891b2',Functional:'#94a3b8'};
-
+  // Build new category blocks, reusing preserved item nodes
+  const allCats=[...new Set([...catOrder,...Object.keys(ffByCat)])].filter(c=>ffByCat[c]);
   sections.innerHTML=allCats.map(cat=>{
     const items=ffByCat[cat]||[];
     const itemsHtml=items.map(({key,dev,prio,type,summary})=>{
       if(existingItems[key]){
-        // Reuse original node — update dev name if reassigned
+        // Reuse the original node — update dev name in case of reassignment
         const orig=existingItems[key];
         const devEl=orig.querySelector('strong');
         if(devEl) devEl.textContent=dev;
         return orig.outerHTML;
       }
-      // Fallback for manually-added false flags with no original node
-      return `<div class="ff-item" data-ff-key="${key}">
+      // Fallback for manually-flagged items with no original node
+      const prioBg={Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
+      const typeBg={'API / Backend':'#6366f1','UI / Frontend':'#ec4899',Security:'#dc2626',
+        Validation:'#f59e0b','Data / CRUD':'#0891b2',Functional:'#94a3b8'};
+      return `<div class="ff-item" data-ff-key="${key}" data-ff-dev="${dev}" data-ff-cat="${cat}">
         <a href="https://brightlysoftware.atlassian.net/browse/${key}" target="_blank" class="jira-link">${key}</a>
         <span class="badge" style="background:${prioBg[prio]||'#64748b'}">${prio}</span>
         <span class="badge" style="background:${typeBg[type]||'#94a3b8'}">${type}</span>
@@ -7259,12 +7379,13 @@ function refreshFalseFlags(){
       </div>`;
     }).join('');
     return `<div class="ff-category-card" data-ff-cat="${cat}">
-      <h3>${catIcon[cat]||'✅'} ${cat} — ${items.length}</h3>
+      <h3>${catHdIcon(cat)} ${cat} — ${items.length}</h3>
       ${itemsHtml}
     </div>`;
   }).join('');
 
-  // Rebuild by-developer grid
+  // Update false-flags-by-developer grid
+  const prioBg={Blocker:'#dc2626',Urgent:'#ea580c',High:'#d97706',Medium:'#2563eb',Low:'#16a34a'};
   byDevGrid.innerHTML=Object.entries(ffByDev).sort((a,b)=>b[1].length-a[1].length).map(([dev,ffs])=>`
     <div class="lb-card" style="border-color:var(--purple)">
       <h3 style="color:var(--purple)">${dev} — ${ffs.length}</h3>
@@ -7277,10 +7398,133 @@ function refreshFalseFlags(){
       </tbody></table>
     </div>`).join('');
 
-  // Update section title count
+  // Update the section title count
   const titleEl=document.querySelector('#tab-falseflags h2.section-title');
   const total=Object.values(ffByCat).reduce((s,a)=>s+a.length,0);
   if(titleEl) titleEl.textContent=`⚑ False Flag Defects — ${total} Identified`;
+}
+
+// ── Defect analysis report (classification + prevention gates) ───────────
+const TYPE_GATE_MAP={
+  'Functional':'Add behavior-parity test packs against expected rules before merge; gate release on parity pass for modified workflows.',
+  'UI / Frontend':'Add visual regression checks for key pages, responsive snapshots, and interaction smoke tests before story close.',
+  'API / Backend':'Gate with contract tests and negative tests for each endpoint; enforce 4xx vs 5xx mapping checks in CI.',
+  'Security':'Require permission-matrix tests in CI, add threat-model checklist in PR, and block release if any authz scenario fails.',
+  'Validation':'Add boundary and invalid-input test suites, and enforce schema validation so invalid payloads fail fast with clear 4xx errors.',
+  'Data / CRUD':'Run CRUD state transition tests with rollback checks and ensure delete/update rules match constraints before deploy.',
+  'Performance':'Add baseline latency thresholds in CI with regression alerts and fail builds when p95 exceeds agreed budget.'
+};
+
+const PATTERN_RULES=[
+  {name:'Permission / Access Control', regex:/(permission|access|unauthor|role|security|rights?)/i, gate:'Permission matrix automation for role x action scenarios'},
+  {name:'Validation / Input Boundaries', regex:/(validation|required|mandatory|invalid|max|length|range|negative|character)/i, gate:'Boundary-value and invalid-input CI suite'},
+  {name:'Error Handling / Server 500', regex:/(server error|internal server error|500|exception|dbcontext)/i, gate:'Error contract tests for deterministic 4xx/5xx mapping'},
+  {name:'UI Parity / Display', regex:/(ui|display|label|button|screen|layout|modal|dropdown|pagination|scroll|icon|mismatch)/i, gate:'Visual regression and UX parity snapshots per module'},
+  {name:'API Contract / Integration', regex:/(api|endpoint|graphql|rest|payload|response|not working|failing)/i, gate:'Provider-consumer contract tests and compatibility gate'},
+  {name:'Workflow / State Transition', regex:/(save|delete|create|update|status|not able|unable|missing)/i, gate:'End-to-end state transition checks in test pipeline'}
+];
+
+function escHtml(v){
+  return String(v||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function refreshDefectAnalysis(){
+  const rows=[...document.querySelectorAll('#tab-developers tr[data-key]')];
+  if(!rows.length) return;
+
+  const analysedRows=rows;
+  const totalAnalysed=analysedRows.length;
+  const ffIncluded=analysedRows.filter(r=>r.classList.contains('ff-row')).length;
+  const byType={};
+  const highRisk={count:0};
+  const highBounce={count:0};
+  const typeSignals={};
+  const patternHits={};
+
+  analysedRows.forEach(row=>{
+    const type=(row.cells[3]?.textContent||'Unknown').trim();
+    const prio=(row.cells[4]?.textContent||'').trim();
+    const bounce=parseInt((row.cells[9]?.textContent||'0').trim(),10)||0;
+    const summary=(row.cells[2]?.dataset?.full||row.cells[2]?.textContent||'').trim();
+
+    byType[type]=(byType[type]||0)+1;
+    if(prio==='Blocker'||prio==='Urgent') highRisk.count++;
+    if(bounce>=3) highBounce.count++;
+
+    const matched=PATTERN_RULES.filter(rule=>rule.regex.test(summary));
+    matched.forEach(rule=>{
+      patternHits[rule.name]=patternHits[rule.name]||{count:0,gate:rule.gate};
+      patternHits[rule.name].count++;
+      typeSignals[type]=typeSignals[type]||{};
+      typeSignals[type][rule.name]=(typeSignals[type][rule.name]||0)+1;
+    });
+  });
+
+  const sortedTypes=Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+  const typeRows=sortedTypes.map((entry,idx)=>{
+    const type=entry[0];
+    const count=entry[1];
+    const pct=totalAnalysed?((count/totalAnalysed)*100).toFixed(1):'0.0';
+    const signals=Object.entries(typeSignals[type]||{})
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,2)
+      .map(([name,n])=>name+' ('+n+')')
+      .join(' · ') || 'General regression mix';
+    const gates=TYPE_GATE_MAP[type]||'Add targeted tests and release checks for this class before merge.';
+
+    return '<tr class="'+(idx%2===0?'row-even':'row-odd')+'">'+
+      '<td class="num-col">'+(idx+1)+'</td>'+
+      '<td>'+escHtml(type)+'</td>'+
+      '<td>'+count+'</td>'+
+      '<td>'+pct+'%</td>'+
+      '<td>'+escHtml(signals)+'</td>'+
+      '<td>'+escHtml(gates)+'</td>'+
+      '</tr>';
+  }).join('');
+
+  const sortedPatterns=Object.entries(patternHits)
+    .sort((a,b)=>b[1].count-a[1].count)
+    .slice(0,8);
+
+  const patternRows=sortedPatterns.map((entry,idx)=>{
+    const name=entry[0];
+    const meta=entry[1];
+    return '<tr class="'+(idx%2===0?'row-even':'row-odd')+'">'+
+      '<td class="num-col">'+(idx+1)+'</td>'+
+      '<td>'+escHtml(name)+'</td>'+
+      '<td>'+meta.count+'</td>'+
+      '<td>'+escHtml(meta.gate)+'</td>'+
+      '</tr>';
+  }).join('');
+
+  const topType=sortedTypes[0]?.[0]||'Functional';
+  const topPattern=sortedPatterns[0]?.[0]||'Validation / Input Boundaries';
+  const gateList=[
+    'Introduce mandatory pre-merge checks for '+topType+' defects using focused automated tests and reviewer checklist items.',
+    'Create a CI quality gate for '+topPattern+' issues and fail build when new violations are introduced.',
+    'Run a role and permission regression suite before release to prevent security and unauthorized workflow escapes.',
+    'Enforce negative-path API and validation tests so bad inputs return clear client errors instead of server failures.',
+    'Add parity test charters for high-change modules to catch behavior differences against enterprise expectations.'
+  ];
+
+  const typeBody=document.getElementById('da-type-rows');
+  const patternBody=document.getElementById('da-pattern-rows');
+  const gateListEl=document.getElementById('da-gate-list');
+  if(typeBody) typeBody.innerHTML=typeRows;
+  if(patternBody) patternBody.innerHTML=patternRows || '<tr><td class="num-col">1</td><td>General regression mix</td><td>0</td><td>Add module-level quality gates</td></tr>';
+  if(gateListEl) gateListEl.innerHTML=gateList.map(g=>'<li>'+escHtml(g)+'</li>').join('');
+
+  const repeatSignals=Object.values(patternHits).reduce((s,v)=>s+v.count,0);
+  const setTxt=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=String(val); };
+  setTxt('da-real-total',totalAnalysed);
+  setTxt('da-ff-included',ffIncluded);
+  setTxt('da-high-risk',highRisk.count);
+  setTxt('da-bounce-risk',highBounce.count);
+  setTxt('da-repeat-signals',repeatSignals);
 }
 
 // ── row numbering ──────────────────────────────────────────────────────────
@@ -7296,7 +7540,7 @@ function renumberRows(){
 
 // ── tabs ───────────────────────────────────────────────────────────────────
 function switchTab(name){
-  const ids=['overview','developers','leaderboard','falseflags'];
+  const ids=['overview','developers','leaderboard','defectanalysis','falseflags'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',ids[i]===name));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
 }
